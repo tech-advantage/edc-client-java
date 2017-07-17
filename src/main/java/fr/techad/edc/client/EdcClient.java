@@ -5,6 +5,7 @@
 
 package fr.techad.edc.client;
 
+import fr.techad.edc.client.model.ContextItem;
 import fr.techad.edc.client.model.InvalidUrlException;
 
 import java.io.IOException;
@@ -27,6 +28,42 @@ public interface EdcClient {
      * @throws InvalidUrlException if the url is malformed
      */
     String getContextWebHelpUrl(String mainKey, String subKey, String languageCode) throws IOException, InvalidUrlException;
+
+    /**
+     * Create the url for the context according to the main key, the subkey and the language code.
+     * <p>
+     * The language code is 2 digits in lowercase ie fr, en, ...
+     *
+     * @param mainKey      the main key
+     * @param subKey       the sub key
+     * @param rank         the rank
+     * @param languageCode the language code
+     * @return the url
+     * @throws IOException         if an error is occurred on reading
+     * @throws InvalidUrlException if the url is malformed
+     */
+    String getContextWebHelpUrl(String mainKey, String subKey, int rank, String languageCode) throws IOException, InvalidUrlException;
+
+    /**
+     * Create the url for the documentation.
+     * <p>
+     * The language code is 2 digits in lowercase ie fr, en, ...
+     *
+     * @param id the identifier of the documentation
+     * @return the url
+     */
+    String getDocumentationWebHelpUrl(Long id) throws InvalidUrlException;
+
+    /**
+     * Return the context item associated with main and sub keys.
+     *
+     * @param mainKey the main key
+     * @param subKey  the sub bey
+     * @return the context item
+     * @throws IOException         if an error is occurred on reading
+     * @throws InvalidUrlException if the url is malformed
+     */
+    ContextItem getContextItem(String mainKey, String subKey, String languageCode) throws IOException, InvalidUrlException;
 
     /**
      * Define the server url like http://localhost:8080

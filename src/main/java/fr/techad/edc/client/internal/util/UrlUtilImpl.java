@@ -28,4 +28,9 @@ public class UrlUtilImpl implements UrlUtil {
     public String getContextUrl(String mainKey, String subKey, String languageCode, int articleIndex) throws InvalidUrlException {
         return clientConfiguration.getWebHelpUrl()+"/context/" + mainKey + "/" + subKey + "/" + languageCode + "/" + articleIndex;
     }
+
+    @Override
+    public String getDocumentationUrl(Long id) throws InvalidUrlException {
+        return clientConfiguration.getWebHelpUrl()+"/doc/"+id;
+    }
 }

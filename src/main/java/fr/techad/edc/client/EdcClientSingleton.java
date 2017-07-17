@@ -8,6 +8,7 @@ package fr.techad.edc.client;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import fr.techad.edc.client.injector.EdcClientModule;
+import fr.techad.edc.client.model.ContextItem;
 import fr.techad.edc.client.model.InvalidUrlException;
 
 import java.io.IOException;
@@ -53,6 +54,21 @@ public class EdcClientSingleton implements EdcClient {
     @Override
     public String getContextWebHelpUrl(String mainKey, String subKey, String languageCode) throws IOException, InvalidUrlException {
         return edcClient.getContextWebHelpUrl(mainKey, subKey, languageCode);
+    }
+
+    @Override
+    public String getContextWebHelpUrl(String mainKey, String subKey, int rank, String languageCode) throws IOException, InvalidUrlException {
+        return edcClient.getContextWebHelpUrl(mainKey, subKey, rank, languageCode);
+    }
+
+    @Override
+    public String getDocumentationWebHelpUrl(Long id) throws InvalidUrlException {
+        return edcClient.getDocumentationWebHelpUrl(id);
+    }
+
+    @Override
+    public ContextItem getContextItem(String mainKey, String subKey, String languageCode) throws IOException, InvalidUrlException {
+        return edcClient.getContextItem(mainKey, subKey, languageCode);
     }
 
     @Override

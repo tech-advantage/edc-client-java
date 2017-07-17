@@ -36,14 +36,31 @@ public class EdcClientImpl implements EdcClient {
 
     @Override
     public String getContextWebHelpUrl(String mainKey, String subKey, String languageCode) throws IOException, InvalidUrlException {
-        LOGGER.debug("Get WebHelp Context item with mainkey: {}, subKey: {}, languageCode:{}", mainKey,subKey,languageCode);
+        LOGGER.debug("Get WebHelp Context item with mainKey: {}, subKey: {}, languageCode:{}", mainKey, subKey, languageCode);
+        return getContextWebHelpUrl(mainKey, subKey, 0, languageCode);
+    }
+
+    @Override
+    public String getContextWebHelpUrl(String mainKey, String subKey, int rank, String languageCode) throws IOException, InvalidUrlException {
+        LOGGER.debug("Get WebHelp Context item with mainKey: {}, subKey: {}, languageCode:{}", mainKey, subKey, languageCode);
         String url = null;
         ContextItem context = documentationManager.getContext(mainKey, subKey, languageCode);
         if (context != null && context.articleSize() > 0) {
-            url = urlUtil.getContextUrl(mainKey, subKey, languageCode, 0);
+            url = urlUtil.getContextUrl(mainKey, subKey, languageCode, rank);
         }
-        LOGGER.debug("Get WebHelp url: {}",url);
+        LOGGER.debug("Get WebHelp url: {}", url);
         return url;
+    }
+
+    @Override
+    public String getDocumentationWebHelpUrl(Long id) throws InvalidUrlException {
+        return urlUtil.getDocumentationUrl(id);
+    }
+
+    @Override
+    public ContextItem getContextItem(String mainKey, String subKey, String languageCode) throws IOException, InvalidUrlException {
+        LOGGER.debug("Get WebHelp Context item with mainKey: {}, subKey: {}, languageCode:{}", mainKey, subKey, languageCode);
+        return documentationManager.getContext(mainKey, subKey, languageCode);
     }
 
     @Override

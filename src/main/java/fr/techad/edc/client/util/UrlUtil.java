@@ -22,4 +22,12 @@ public interface UrlUtil {
      * @throws InvalidUrlException IF the url is malformed
      */
     String getContextUrl(String mainKey, String subKey, String languageCode, int articleIndex) throws InvalidUrlException;
+
+
+    /**
+     * Build the web help documentation url for the document defined by the identifier
+     * @param id the idenitifer of the documentation
+     * @return the url
+     */
+    String getDocumentationUrl(Long id) throws InvalidUrlException;
 }

@@ -6,6 +6,7 @@ package fr.techad.edc.client.internal;
 
 import fr.techad.edc.client.CommonBase;
 import fr.techad.edc.client.EdcClient;
+import fr.techad.edc.client.model.ContextItem;
 import fr.techad.edc.client.model.InvalidUrlException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,5 +32,26 @@ public class EdcClientImplTest extends CommonBase {
         String url = edcClient.getContextWebHelpUrl("fr.techad.edc", "help.center", "en");
         Assert.assertEquals("https://demo.easydoccontents.com/help/context/fr.techad.edc/help.center/en/0", url);
     }
+
+    @Test
+    public void shouldGetContextUrlWithRank() throws IOException, InvalidUrlException {
+        String url = edcClient.getContextWebHelpUrl("fr.techad.edc", "help.center", 2, "en");
+        Assert.assertEquals("https://demo.easydoccontents.com/help/context/fr.techad.edc/help.center/en/2", url);
+    }
+
+    @Test
+    public void shouldGetContext() throws IOException, InvalidUrlException {
+        ContextItem contextItem = edcClient.getContextItem("fr.techad.edc", "help.center", "en");
+        Assert.assertNotNull(contextItem);
+        Assert.assertEquals(1,contextItem.articleSize());
+        Assert.assertEquals(3,contextItem.linkSize());
+    }
+
+    @Test
+    public void shouldGetDocumentationUrl() throws InvalidUrlException {
+        String documentationWebHelpUrl = edcClient.getDocumentationWebHelpUrl(434L);
+        Assert.assertEquals("https://demo.easydoccontents.com/help/doc/434", documentationWebHelpUrl);
+    }
+
 
 }
