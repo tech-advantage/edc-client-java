@@ -20,7 +20,7 @@ public interface UrlUtil {
      * @param languageCode  the language code
      * @param articleIndex  the article index to display
      * @return the url
-     * @throws InvalidUrlException IF the url is malformed
+     * @throws InvalidUrlException If the url is malformed
      */
     String getContextUrl(String publicationId, String mainKey, String subKey, String languageCode, int articleIndex) throws InvalidUrlException;
 
@@ -30,6 +30,7 @@ public interface UrlUtil {
      *
      * @param id the idenitifer of the documentation
      * @return the url
+     * @throws InvalidUrlException If the url is malformed
      */
     String getDocumentationUrl(Long id) throws InvalidUrlException;
 }

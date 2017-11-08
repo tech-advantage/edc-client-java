@@ -51,14 +51,16 @@ public interface EdcClient {
      *
      * @param id the identifier of the documentation
      * @return the url
+     * @throws InvalidUrlException If the url is malformed
      */
     String getDocumentationWebHelpUrl(Long id) throws InvalidUrlException;
 
     /**
-     * Return the context item associated with main and sub keys.
+     * Return the context item associated with main and sub keys and the language code.
      *
-     * @param mainKey the main key
-     * @param subKey  the sub bey
+     * @param mainKey      the main key
+     * @param subKey       the sub bey
+     * @param languageCode the language code
      * @return the context item
      * @throws IOException         if an error is occurred on reading
      * @throws InvalidUrlException if the url is malformed
@@ -77,6 +79,7 @@ public interface EdcClient {
      * The default value is 'doc'. Do nothing if you don't change the default behavior.
      *
      * @param documentationContextUrl the documentation context url
+     * @throws InvalidUrlException if the url is malformed
      */
     void setDocumentationContextUrl(String documentationContextUrl) throws InvalidUrlException;
 
@@ -85,6 +88,7 @@ public interface EdcClient {
      * The default value is 'help'. Do nothing if you don't change the default behavior.
      *
      * @param webHelpContextUrl the web help context url
+     * @throws InvalidUrlException if the url is malformed
      */
     void setWebHelpContextUrl(String webHelpContextUrl) throws InvalidUrlException;
 
