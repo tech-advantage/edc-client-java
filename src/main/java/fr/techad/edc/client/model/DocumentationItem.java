@@ -41,6 +41,20 @@ public interface DocumentationItem extends ObjectId {
     void setUrl(String url);
 
     /**
+     * Get the publication id.
+     *
+     * @return the publicationId
+     */
+    String getPublicationId();
+
+    /**
+     * Define the publication id
+     *
+     * @param publicationId the identifier of the publication
+     */
+    void setPublicationId(String publicationId);
+
+    /**
      * Return the language code of this documentation.
      * <p>
      * The code is defined by 2 digits in lowercase.

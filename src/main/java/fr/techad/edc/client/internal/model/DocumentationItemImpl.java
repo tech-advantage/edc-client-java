@@ -20,6 +20,7 @@ import java.util.List;
 public class DocumentationItemImpl extends ObjectIdImpl implements DocumentationItem {
 
     private String label;
+    private String publicationId;
     private String url;
     private String languageCode;
     private DocumentationItemType documentationItemType;
@@ -51,6 +52,16 @@ public class DocumentationItemImpl extends ObjectIdImpl implements Documentation
     @Override
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    @Override
+    public String getPublicationId() {
+        return publicationId;
+    }
+
+    @Override
+    public void setPublicationId(String publicationId) {
+        this.publicationId = publicationId;
     }
 
     @Override

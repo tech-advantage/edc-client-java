@@ -46,7 +46,7 @@ public class EdcClientImpl implements EdcClient {
         String url = null;
         ContextItem context = documentationManager.getContext(mainKey, subKey, languageCode);
         if (context != null && context.articleSize() > 0) {
-            url = urlUtil.getContextUrl(mainKey, subKey, languageCode, rank);
+            url = urlUtil.getContextUrl(context.getPublicationId(), mainKey, subKey, languageCode, rank);
         }
         LOGGER.debug("Get WebHelp url: {}", url);
         return url;

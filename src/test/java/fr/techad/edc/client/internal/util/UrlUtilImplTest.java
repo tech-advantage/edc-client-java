@@ -20,8 +20,8 @@ public class UrlUtilImplTest extends CommonBase {
     @Test
     public void shouldCreateAnUrl() throws InvalidUrlException {
         UrlUtil urlUtil = createUrlBuilder();
-        String url = urlUtil.getContextUrl("fr.techad.edc", "help.center", "en", 0);
-        Assert.assertEquals("https://demo.easydoccontents.com/help/context/fr.techad.edc/help.center/en/0", url);
+        String url = urlUtil.getContextUrl("fr.techad.edc.help","fr.techad.edc", "help.center", "en", 0);
+        Assert.assertEquals("https://demo.easydoccontents.com/help/context/fr.techad.edc.help/fr.techad.edc/help.center/en/0", url);
     }
 
 

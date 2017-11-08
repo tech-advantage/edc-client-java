@@ -14,18 +14,20 @@ public interface UrlUtil {
     /**
      * Build the web help context url for the brick defined with the keys, the language and the index of the article to display
      *
-     * @param mainKey      the main key
-     * @param subKey       the sub key
-     * @param languageCode the language code
-     * @param articleIndex the article index to display
+     * @param publicationId the identifier of the publication
+     * @param mainKey       the main key
+     * @param subKey        the sub key
+     * @param languageCode  the language code
+     * @param articleIndex  the article index to display
      * @return the url
      * @throws InvalidUrlException IF the url is malformed
      */
-    String getContextUrl(String mainKey, String subKey, String languageCode, int articleIndex) throws InvalidUrlException;
+    String getContextUrl(String publicationId, String mainKey, String subKey, String languageCode, int articleIndex) throws InvalidUrlException;
 
 
     /**
      * Build the web help documentation url for the document defined by the identifier
+     *
      * @param id the idenitifer of the documentation
      * @return the url
      */

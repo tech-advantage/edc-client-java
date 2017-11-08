@@ -20,17 +20,17 @@ public class UrlUtilImpl implements UrlUtil {
 
     @Inject
     public UrlUtilImpl(ClientConfiguration clientConfiguration) {
-        this.clientConfiguration=clientConfiguration;
+        this.clientConfiguration = clientConfiguration;
 
     }
 
     @Override
-    public String getContextUrl(String mainKey, String subKey, String languageCode, int articleIndex) throws InvalidUrlException {
-        return clientConfiguration.getWebHelpUrl()+"/context/" + mainKey + "/" + subKey + "/" + languageCode + "/" + articleIndex;
+    public String getContextUrl(String publicationId, String mainKey, String subKey, String languageCode, int articleIndex) throws InvalidUrlException {
+        return clientConfiguration.getWebHelpUrl() + "/context/" + publicationId + "/" + mainKey + "/" + subKey + "/" + languageCode + "/" + articleIndex;
     }
 
     @Override
     public String getDocumentationUrl(Long id) throws InvalidUrlException {
-        return clientConfiguration.getWebHelpUrl()+"/doc/"+id;
+        return clientConfiguration.getWebHelpUrl() + "/doc/" + id;
     }
 }

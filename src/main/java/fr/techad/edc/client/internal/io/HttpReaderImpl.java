@@ -6,6 +6,7 @@ package fr.techad.edc.client.internal.io;
 
 import com.google.common.base.Enums;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -37,6 +38,7 @@ public class HttpReaderImpl implements EdcReader {
     /**
      * The default name which contain the context definition
      */
+    private static final String MULTI_DOC_FILE = "multi-doc.json";
     private static final String CONTEXT_FILE = "context.json";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpReaderImpl.class);
@@ -58,7 +60,39 @@ public class HttpReaderImpl implements EdcReader {
 
     @Override
     public Map<String, ContextItem> readContext() throws IOException, InvalidUrlException {
-        String urlContext = StringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + CONTEXT_FILE;
+        Map<String, ContextItem> contexts = Maps.newHashMap();
+        for (String publicationId : readPublicationIds()) {
+            contexts.putAll(readContext(publicationId));
+        }
+        return contexts;
+    }
+
+    private Set<String> readPublicationIds() throws InvalidUrlException, IOException {
+        Set<String> publicationIds = Sets.newHashSet();
+        String multiDocUrl = StringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + MULTI_DOC_FILE;
+        LOGGER.info("Context url: {}", multiDocUrl);
+        String content = client.get(multiDocUrl);
+        // Decode Json
+        JsonArray jsonArray;
+        try {
+            JsonParser jsonParser = new JsonParser();
+            JsonElement jsonContent = jsonParser.parse(content);
+            jsonArray = jsonContent.getAsJsonArray();
+        } catch (JsonSyntaxException e) {
+            LOGGER.error("Context is not json: {}", content);
+            throw new IOException("The response of server is unknown format, wait json response.");
+        }
+        for (JsonElement jsonElement : jsonArray) {
+            if (jsonElement.isJsonObject()) {
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
+                publicationIds.add(jsonObject.get("pluginId").getAsString());
+            }
+        }
+        return publicationIds;
+    }
+
+    private Map<String, ContextItem> readContext(String publicationId) throws IOException, InvalidUrlException {
+        String urlContext = StringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + publicationId + "/" + CONTEXT_FILE;
         LOGGER.info("Context url: {}", urlContext);
         String content = client.get(urlContext);
 
@@ -76,24 +110,24 @@ public class HttpReaderImpl implements EdcReader {
         LOGGER.debug("jsonObject: {}", jsonObject);
         Set<Map.Entry<String, JsonElement>> entries = jsonObject.entrySet();
         Map<String, ContextItem> contexts = Maps.newHashMap();
-        entries.forEach(e -> parseContext(contexts, e.getKey(), e.getValue()));
+        entries.forEach(e -> parseContext(contexts, publicationId, e.getKey(), e.getValue()));
 
         return contexts;
     }
 
-    private void parseContext(Map<String, ContextItem> contexts, String mainKey, JsonElement jsonElement) {
+    private void parseContext(Map<String, ContextItem> contexts, String publicationId, String mainKey, JsonElement jsonElement) {
         LOGGER.debug("Decode for main key: {}", mainKey);
         Set<Map.Entry<String, JsonElement>> entries = jsonElement.getAsJsonObject().entrySet();
-        entries.forEach(e -> parseContext(contexts, mainKey, e.getKey(), e.getValue()));
+        entries.forEach(e -> parseContext(contexts, publicationId, mainKey, e.getKey(), e.getValue()));
     }
 
-    private void parseContext(Map<String, ContextItem> contexts, String mainKey, String subKey, JsonElement jsonElement) {
+    private void parseContext(Map<String, ContextItem> contexts, String publicationId, String mainKey, String subKey, JsonElement jsonElement) {
         LOGGER.debug("Decode for sub key: {}", subKey);
         Set<Map.Entry<String, JsonElement>> entries = jsonElement.getAsJsonObject().entrySet();
-        entries.forEach(e -> createContext(contexts, mainKey, subKey, e.getKey(), e.getValue()));
+        entries.forEach(e -> createContext(contexts, publicationId, mainKey, subKey, e.getKey(), e.getValue()));
     }
 
-    private void createContext(Map<String, ContextItem> contexts, String mainKey, String subKey, String languageCode, JsonElement jsonElement) {
+    private void createContext(Map<String, ContextItem> contexts, String publicationId, String mainKey, String subKey, String languageCode, JsonElement jsonElement) {
         LOGGER.debug("Decode for language code: {}", languageCode);
         JsonObject jsonCtxt = jsonElement.getAsJsonObject();
         String description = jsonCtxt.get("description").getAsString();
@@ -102,6 +136,7 @@ public class HttpReaderImpl implements EdcReader {
         contextItem.setLabel(getLabel(jsonCtxt));
         contextItem.setLanguageCode(languageCode);
         contextItem.setUrl(getUrl(jsonCtxt));
+        contextItem.setPublicationId(publicationId);
         contextItem.setDescription(description);
         contextItem.setMainKey(mainKey);
         contextItem.setSubKey(subKey);
