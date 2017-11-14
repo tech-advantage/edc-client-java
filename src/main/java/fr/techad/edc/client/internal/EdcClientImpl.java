@@ -45,8 +45,10 @@ public class EdcClientImpl implements EdcClient {
         LOGGER.debug("Get WebHelp Context item with mainKey: {}, subKey: {}, languageCode:{}", mainKey, subKey, languageCode);
         String url = null;
         ContextItem context = documentationManager.getContext(mainKey, subKey, languageCode);
-        if (context != null && context.articleSize() > 0) {
+        if (context != null && (context.articleSize() > 0 || context.linkSize() > 0)) {
             url = urlUtil.getContextUrl(context.getPublicationId(), mainKey, subKey, languageCode, rank);
+        } else {
+            url = urlUtil.getHomeUrl();
         }
         LOGGER.debug("Get WebHelp url: {}", url);
         return url;
@@ -54,7 +56,12 @@ public class EdcClientImpl implements EdcClient {
 
     @Override
     public String getDocumentationWebHelpUrl(Long id) throws InvalidUrlException {
-        return urlUtil.getDocumentationUrl(id);
+        String url;
+        if (id != null)
+            url = urlUtil.getDocumentationUrl(id);
+        else
+            url = urlUtil.getHomeUrl();
+        return url;
     }
 
     @Override

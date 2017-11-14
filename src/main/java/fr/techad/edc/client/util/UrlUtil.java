@@ -12,6 +12,22 @@ import fr.techad.edc.client.model.InvalidUrlException;
 public interface UrlUtil {
 
     /**
+     * Return the home url for the help client
+     *
+     * @return the home url
+     * @throws InvalidUrlException If the base url is not defined
+     */
+    String getHomeUrl() throws InvalidUrlException;
+
+    /**
+     * Return the error url for the help client
+     *
+     * @return the home url
+     * @throws InvalidUrlException If the base url is not defined
+     */
+    String getErrorUrl() throws InvalidUrlException;
+
+    /**
      * Build the web help context url for the brick defined with the keys, the language and the index of the article to display
      *
      * @param publicationId the identifier of the publication

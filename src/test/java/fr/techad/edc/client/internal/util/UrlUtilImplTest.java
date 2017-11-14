@@ -18,11 +18,38 @@ import org.junit.Test;
 public class UrlUtilImplTest extends CommonBase {
 
     @Test
-    public void shouldCreateAnUrl() throws InvalidUrlException {
+    public void shouldGetHomeUrl() throws InvalidUrlException {
+        UrlUtil urlUtil = createUrlBuilder();
+        String url = urlUtil.getHomeUrl();
+        Assert.assertEquals("https://demo.easydoccontents.com/help/home", url);
+    }
+    @Test
+    public void shouldGetErrorUrl() throws InvalidUrlException {
+        UrlUtil urlUtil = createUrlBuilder();
+        String url = urlUtil.getErrorUrl();
+        Assert.assertEquals("https://demo.easydoccontents.com/help/error", url);
+    }
+    @Test
+    public void shouldCreateAContextUrl() throws InvalidUrlException {
         UrlUtil urlUtil = createUrlBuilder();
         String url = urlUtil.getContextUrl("fr.techad.edc.help","fr.techad.edc", "help.center", "en", 0);
         Assert.assertEquals("https://demo.easydoccontents.com/help/context/fr.techad.edc.help/fr.techad.edc/help.center/en/0", url);
     }
+
+    @Test
+    public void shouldCreateADocUrl() throws InvalidUrlException {
+        UrlUtil urlUtil = createUrlBuilder();
+        String url = urlUtil.getDocumentationUrl(12L);
+        Assert.assertEquals("https://demo.easydoccontents.com/help/doc/12", url);
+    }
+
+    @Test
+    public void shouldCreateADocUrlWithNull() throws InvalidUrlException {
+        UrlUtil urlUtil = createUrlBuilder();
+        String url = urlUtil.getDocumentationUrl(null);
+        Assert.assertEquals("https://demo.easydoccontents.com/help/doc/null", url);
+    }
+
 
 
 }

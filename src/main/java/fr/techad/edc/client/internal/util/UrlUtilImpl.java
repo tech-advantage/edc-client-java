@@ -25,6 +25,16 @@ public class UrlUtilImpl implements UrlUtil {
     }
 
     @Override
+    public String getHomeUrl() throws InvalidUrlException {
+        return clientConfiguration.getWebHelpUrl() + "/home";
+    }
+
+    @Override
+    public String getErrorUrl() throws InvalidUrlException {
+        return clientConfiguration.getWebHelpUrl() + "/error";
+    }
+
+    @Override
     public String getContextUrl(String publicationId, String mainKey, String subKey, String languageCode, int articleIndex) throws InvalidUrlException {
         return clientConfiguration.getWebHelpUrl() + "/context/" + publicationId + "/" + mainKey + "/" + subKey + "/" + languageCode + "/" + articleIndex;
     }
