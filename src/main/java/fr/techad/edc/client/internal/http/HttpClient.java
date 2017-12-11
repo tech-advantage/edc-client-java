@@ -25,7 +25,7 @@ public class HttpClient {
 
     private CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
 
-    public String get(String url) throws IOException {
+    public String get(String url) throws IOException, Error4xxException {
         String txt;
         HttpGet httpGet = new HttpGet(url);
         try (CloseableHttpResponse response1 = closeableHttpClient.execute(httpGet)) {
@@ -34,6 +34,10 @@ public class HttpClient {
             txt = EntityUtils.toString(entity1);
             // do something useful with the response body and ensure it is fully consumed
             EntityUtils.consume(entity1);
+            int statusCode = response1.getStatusLine().getStatusCode();
+            if (statusCode >= 400 && statusCode < 500) {
+                throw new Error4xxException("The url '" + url + "' return " + response1.getStatusLine());
+            }
         }
         return txt;
     }

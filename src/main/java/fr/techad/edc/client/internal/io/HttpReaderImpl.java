@@ -14,6 +14,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import fr.techad.edc.client.injector.provider.ContextItemProvider;
 import fr.techad.edc.client.injector.provider.DocumentationItemProvider;
+import fr.techad.edc.client.internal.http.Error4xxException;
 import fr.techad.edc.client.internal.http.HttpClient;
 import fr.techad.edc.client.io.EdcReader;
 import fr.techad.edc.client.model.ClientConfiguration;
@@ -71,21 +72,21 @@ public class HttpReaderImpl implements EdcReader {
         Set<String> publicationIds = Sets.newHashSet();
         String multiDocUrl = StringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + MULTI_DOC_FILE;
         LOGGER.info("Context url: {}", multiDocUrl);
-        String content = client.get(multiDocUrl);
-        // Decode Json
-        JsonArray jsonArray;
+        String content = null;
         try {
-            JsonParser jsonParser = new JsonParser();
-            JsonElement jsonContent = jsonParser.parse(content);
-            jsonArray = jsonContent.getAsJsonArray();
-        } catch (JsonSyntaxException e) {
-            LOGGER.error("Context is not json: {}", content);
-            throw new IOException("The response of server is unknown format, wait json response.");
+            content = client.get(multiDocUrl);
+        } catch (Error4xxException e) {
+            throw new IOException(e.getMessage());
         }
-        for (JsonElement jsonElement : jsonArray) {
-            if (jsonElement.isJsonObject()) {
-                JsonObject jsonObject = jsonElement.getAsJsonObject();
-                publicationIds.add(jsonObject.get("pluginId").getAsString());
+        // Decode Json
+        JsonElement jsonContent = parseString(content);
+        if (jsonContent.isJsonArray()) {
+            JsonArray jsonArray = jsonContent.getAsJsonArray();
+            for (JsonElement jsonElement : jsonArray) {
+                if (jsonElement.isJsonObject()) {
+                    JsonObject jsonObject = jsonElement.getAsJsonObject();
+                    publicationIds.add(jsonObject.get("pluginId").getAsString());
+                }
             }
         }
         return publicationIds;
@@ -94,25 +95,34 @@ public class HttpReaderImpl implements EdcReader {
     private Map<String, ContextItem> readContext(String publicationId) throws IOException, InvalidUrlException {
         String urlContext = StringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + publicationId + "/" + CONTEXT_FILE;
         LOGGER.info("Context url: {}", urlContext);
-        String content = client.get(urlContext);
+        Map<String, ContextItem> contexts = Maps.newHashMap();
+        try {
+            String content = client.get(urlContext);
+            // Decode Json
+            JsonElement jsonContent = parseString(content);
+            if (jsonContent.isJsonObject()) {
+                JsonObject jsonObject = jsonContent.getAsJsonObject();
+                LOGGER.debug("jsonObject: {}", jsonObject);
+                Set<Map.Entry<String, JsonElement>> entries = jsonObject.entrySet();
+                entries.forEach(e -> parseContext(contexts, publicationId, e.getKey(), e.getValue()));
+            }
+        } catch (Error4xxException e) {
+            // For multi product, some product should be undefined, ignore it in this case.
+            LOGGER.warn("No context found, the product was not published", e);
+        }
+        return contexts;
+    }
 
-        // Decode Json
-        JsonObject jsonObject;
+    private JsonElement parseString(String text) throws IOException {
+        JsonElement jsonContent;
         try {
             JsonParser jsonParser = new JsonParser();
-            JsonElement jsonContent = jsonParser.parse(content);
-            jsonObject = jsonContent.getAsJsonObject();
+             jsonContent = jsonParser.parse(text);
         } catch (JsonSyntaxException e) {
-            LOGGER.error("Context is not json: {}", content);
+            LOGGER.error("Context is not json: {}", text);
             throw new IOException("The response of server is unknown format, wait json response.");
         }
-
-        LOGGER.debug("jsonObject: {}", jsonObject);
-        Set<Map.Entry<String, JsonElement>> entries = jsonObject.entrySet();
-        Map<String, ContextItem> contexts = Maps.newHashMap();
-        entries.forEach(e -> parseContext(contexts, publicationId, e.getKey(), e.getValue()));
-
-        return contexts;
+        return jsonContent;
     }
 
     private void parseContext(Map<String, ContextItem> contexts, String publicationId, String mainKey, JsonElement jsonElement) {
