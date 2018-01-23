@@ -4,6 +4,7 @@
 
 package fr.techad.edc.client.internal.model;
 
+import fr.techad.edc.client.internal.util.EdcStringUtils;
 import fr.techad.edc.client.model.ClientConfiguration;
 import fr.techad.edc.client.model.InvalidUrlException;
 import org.apache.commons.lang3.StringUtils;
@@ -57,13 +58,13 @@ public class ClientConfigurationImpl implements ClientConfiguration {
     public String getWebHelpUrl() throws InvalidUrlException {
         if (StringUtils.isBlank(serverUrl))
             throw new InvalidUrlException("The server url is not defined");
-        return StringUtils.appendIfMissing(serverUrl, "/") + webHelpContext;
+        return EdcStringUtils.appendIfMissing(serverUrl, "/") + webHelpContext;
     }
 
     @Override
     public String getDocumentationUrl() throws InvalidUrlException {
         if (StringUtils.isBlank(serverUrl))
             throw new InvalidUrlException("The server url is not defined");
-        return StringUtils.appendIfMissing(serverUrl, "/") + documentationContext;
+        return EdcStringUtils.appendIfMissing(serverUrl, "/") + documentationContext;
     }
 }

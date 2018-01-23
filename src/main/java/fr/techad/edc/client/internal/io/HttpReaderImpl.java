@@ -16,6 +16,7 @@ import fr.techad.edc.client.injector.provider.ContextItemProvider;
 import fr.techad.edc.client.injector.provider.DocumentationItemProvider;
 import fr.techad.edc.client.internal.http.Error4xxException;
 import fr.techad.edc.client.internal.http.HttpClient;
+import fr.techad.edc.client.internal.util.EdcStringUtils;
 import fr.techad.edc.client.io.EdcReader;
 import fr.techad.edc.client.model.ClientConfiguration;
 import fr.techad.edc.client.model.ContextItem;
@@ -70,7 +71,7 @@ public class HttpReaderImpl implements EdcReader {
 
     private Set<String> readPublicationIds() throws InvalidUrlException, IOException {
         Set<String> publicationIds = Sets.newHashSet();
-        String multiDocUrl = StringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + MULTI_DOC_FILE;
+        String multiDocUrl = EdcStringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + MULTI_DOC_FILE;
         LOGGER.info("Context url: {}", multiDocUrl);
         String content = null;
         try {
@@ -93,7 +94,7 @@ public class HttpReaderImpl implements EdcReader {
     }
 
     private Map<String, ContextItem> readContext(String publicationId) throws IOException, InvalidUrlException {
-        String urlContext = StringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + publicationId + "/" + CONTEXT_FILE;
+        String urlContext = EdcStringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + publicationId + "/" + CONTEXT_FILE;
         LOGGER.info("Context url: {}", urlContext);
         Map<String, ContextItem> contexts = Maps.newHashMap();
         try {
