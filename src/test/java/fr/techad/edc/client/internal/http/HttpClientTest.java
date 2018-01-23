@@ -4,6 +4,7 @@
 
 package fr.techad.edc.client.internal.http;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,7 +17,7 @@ import java.io.IOException;
  */
 public class HttpClientTest {
 
-    public HttpClient httpClient;
+    private HttpClient httpClient;
 
     @Before
     public void setup() {
@@ -24,8 +25,9 @@ public class HttpClientTest {
     }
 
     @Test
-    public void shouldGetAFile() throws IOException {
+    public void shouldGetAFile() throws IOException, Error4xxException {
         String txt = httpClient.get("https://beta.easydoccontents.com/doc/context.json");
+        Assert.assertFalse(txt.isEmpty());
 
     }
 
