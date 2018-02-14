@@ -93,4 +93,10 @@ public class EdcClientImpl implements EdcClient {
         LOGGER.debug("Force reload");
         documentationManager.forceReload();
     }
+
+    @Override
+    public void loadContext() throws IOException, InvalidUrlException {
+        LOGGER.debug("Loading of the configuration");
+        documentationManager.loadContext();
+    }
 }

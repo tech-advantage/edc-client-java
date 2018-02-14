@@ -36,17 +36,22 @@ public class DocumentationManagerImpl implements DocumentationManager {
 
     @Override
     public ContextItem getContext(String mainKey, String subKey, String languageCode) throws IOException, InvalidUrlException {
-        LOGGER.debug("Get Context item with mainkey: {}, subKey: {}, languageCode:{}", mainKey,subKey,languageCode);
-        if (contexts == null) {
-            LOGGER.debug("No contexts defined, read it");
-            contexts = reader.readContext();
-        }
-        return contexts.get(keyUtil.getKey(mainKey,subKey, languageCode));
+        LOGGER.debug("Get Context item with mainkey: {}, subKey: {}, languageCode:{}", mainKey, subKey, languageCode);
+        loadContext();
+        return contexts.get(keyUtil.getKey(mainKey, subKey, languageCode));
     }
 
     @Override
     public void forceReload() {
         LOGGER.debug("Force reload on next call");
-        contexts=null;
+        contexts = null;
+    }
+
+    @Override
+    public void loadContext() throws IOException, InvalidUrlException {
+        if (contexts == null) {
+            LOGGER.debug("No contexts defined, read it");
+            contexts = reader.readContext();
+        }
     }
 }

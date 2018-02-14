@@ -96,4 +96,12 @@ public interface EdcClient {
      * Force the manager to reload the documentation definition.
      */
     void forceReload();
+
+    /**
+     * Force the documentation loading. This call is optional. Don't call if you want to use the lazy loading.
+     *
+     * @throws IOException         if an is occurred on reading information
+     * @throws InvalidUrlException if the url is malformed.
+     */
+    void loadContext() throws IOException, InvalidUrlException;
 }
