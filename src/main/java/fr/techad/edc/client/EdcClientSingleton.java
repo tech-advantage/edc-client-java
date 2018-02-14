@@ -90,4 +90,9 @@ public class EdcClientSingleton implements EdcClient {
     public void forceReload() {
         edcClient.forceReload();
     }
+
+    @Override
+    public void loadContext() throws IOException, InvalidUrlException {
+        edcClient.loadContext();
+    }
 }
