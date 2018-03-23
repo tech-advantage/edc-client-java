@@ -26,7 +26,7 @@ public class HttpClientTest {
 
     @Test
     public void shouldGetAFile() throws IOException, Error4xxException {
-        String txt = httpClient.get("https://beta.easydoccontents.com/doc/context.json");
+        String txt = httpClient.get("https://demo.easydoccontents.com/doc/edchelp/context.json");
         Assert.assertFalse(txt.isEmpty());
 
     }
