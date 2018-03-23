@@ -30,13 +30,13 @@ public class EdcClientImplTest extends CommonBase {
     @Test
     public void shouldGetContextUrl() throws IOException, InvalidUrlException {
         String url = edcClient.getContextWebHelpUrl("fr.techad.edc", "help.center", "en");
-        Assert.assertEquals("https://demo.easydoccontents.com/help/context/fr.techad.edc/help.center/en/0", url);
+        Assert.assertEquals("https://demo.easydoccontents.com/help/context/edchelp/fr.techad.edc/help.center/en/0", url);
     }
 
     @Test
     public void shouldGetContextUrlWithRank() throws IOException, InvalidUrlException {
         String url = edcClient.getContextWebHelpUrl("fr.techad.edc", "help.center", 2, "en");
-        Assert.assertEquals("https://demo.easydoccontents.com/help/context/fr.techad.edc/help.center/en/2", url);
+        Assert.assertEquals("https://demo.easydoccontents.com/help/context/edchelp/fr.techad.edc/help.center/en/2", url);
     }
 
     @Test

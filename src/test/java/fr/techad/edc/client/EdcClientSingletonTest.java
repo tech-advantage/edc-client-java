@@ -19,6 +19,8 @@ import java.io.IOException;
  */
 public class EdcClientSingletonTest {
 
+    private static final String DEFAULT_URL = "https://demo.easydoccontents.com/help/home";
+
     @Before
     public void setup() {
         EdcClientSingleton.getInstance().setServerUrl(Constants.SERVER_URL);
@@ -33,7 +35,7 @@ public class EdcClientSingletonTest {
     @Test
     public void shouldGetUrl() throws IOException, InvalidUrlException {
         String url = EdcClientSingleton.getInstance().getContextWebHelpUrl("fr.techad.edc", "help.center", "en");
-        Assert.assertEquals("https://demo.easydoccontents.com/help/context/fr.techad.edc/help.center/en/0", url);
+        Assert.assertEquals("https://demo.easydoccontents.com/help/context/edchelp/fr.techad.edc/help.center/en/0", url);
     }
 
     @Test
@@ -41,36 +43,36 @@ public class EdcClientSingletonTest {
         EdcClientSingleton.getInstance().getContextWebHelpUrl("fr.techad.edc", "help.center", "en");
         EdcClientSingleton.getInstance().forceReload();
         String url = EdcClientSingleton.getInstance().getContextWebHelpUrl("fr.techad.edc", "help.center", "en");
-        Assert.assertEquals("https://demo.easydoccontents.com/help/context/fr.techad.edc/help.center/en/0", url);
+        Assert.assertEquals("https://demo.easydoccontents.com/help/context/edchelp/fr.techad.edc/help.center/en/0", url);
     }
 
 
     @Test
-    public void shouldGetNullUrlErrorOnMainKey() throws IOException, InvalidUrlException {
+    public void shouldGetDefaultUrlErrorOnMainKey() throws IOException, InvalidUrlException {
         EdcClientSingleton.getInstance().forceReload();
         String url = EdcClientSingleton.getInstance().getContextWebHelpUrl(null, "help.center", "en");
-        Assert.assertNull(url);
+        Assert.assertEquals(DEFAULT_URL, url);
     }
 
     @Test
     public void shouldGetNullUrlErrorOnSubKey() throws IOException, InvalidUrlException {
         EdcClientSingleton.getInstance().forceReload();
         String url = EdcClientSingleton.getInstance().getContextWebHelpUrl("fr.techad.edc", null, "en");
-        Assert.assertNull(url);
+        Assert.assertEquals(DEFAULT_URL, url);
     }
 
     @Test
-    public void shouldGetNullUrlOnLanguageCode() throws IOException, InvalidUrlException {
+    public void shouldGetDefaultUrlOnLanguageCode() throws IOException, InvalidUrlException {
         EdcClientSingleton.getInstance().forceReload();
         String url = EdcClientSingleton.getInstance().getContextWebHelpUrl("fr.techad.edc", "help.center", null);
-        Assert.assertNull(url);
+        Assert.assertEquals(DEFAULT_URL, url);
     }
 
     @Test
     public void shouldGetUrlWithNewWebHelpContext() throws IOException, InvalidUrlException {
         EdcClientSingleton.getInstance().setWebHelpContextUrl("my-help");
         String url = EdcClientSingleton.getInstance().getContextWebHelpUrl("fr.techad.edc", "help.center", "en");
-        Assert.assertEquals("https://demo.easydoccontents.com/my-help/context/fr.techad.edc/help.center/en/0", url);
+        Assert.assertEquals("https://demo.easydoccontents.com/my-help/context/edchelp/fr.techad.edc/help.center/en/0", url);
     }
 
     @Test(expected = InvalidUrlException.class)
