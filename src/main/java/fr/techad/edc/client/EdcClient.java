@@ -68,6 +68,17 @@ public interface EdcClient {
     ContextItem getContextItem(String mainKey, String subKey, String languageCode) throws IOException, InvalidUrlException;
 
     /**
+     * Return the label translation for the given key
+     * Will try to return in the requested language, or use default if content or i18n file was not found for this language
+     *
+     * @param key the label translation key
+     * @param languageCode the language
+     * @param publicationId default language, to use if content was not found in requested language
+     * @return the translated label
+     */
+    String getTranslatedLabel(String key, String languageCode, String publicationId);
+
+    /**
      * Define the server url like http://localhost:8080
      *
      * @param serverUrl the server url

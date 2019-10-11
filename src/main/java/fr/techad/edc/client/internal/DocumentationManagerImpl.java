@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * TECH ADVANTAGE
@@ -53,5 +55,25 @@ public class DocumentationManagerImpl implements DocumentationManager {
             LOGGER.debug("No contexts defined, read it");
             contexts = reader.readContext();
         }
+    }
+
+    @Override
+    public ContextItem findDefaultContextItem(String mainKey, String subKey, Map<String, String> defaultLangCodes) {
+        ContextItem defaultContext = null;
+        // Find the item corresponding to the mainKey and subKey
+        Set<ContextItem> presentItems = contexts.entrySet().stream()
+                .filter(e -> keyUtil.containsKey(e.getKey(), mainKey, subKey))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toSet());
+        if (!presentItems.isEmpty()) {
+            String exportId = presentItems.stream().map(ContextItem::getPublicationId).findFirst().orElse("");
+            String defaultLang = defaultLangCodes.get(exportId);
+            // Find the context item in the default language
+            defaultContext = presentItems.stream()
+                    .filter(c -> defaultLang.equals(c.getLanguageCode()))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return defaultContext;
     }
 }

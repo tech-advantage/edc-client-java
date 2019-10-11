@@ -72,6 +72,11 @@ public class EdcClientSingleton implements EdcClient {
     }
 
     @Override
+    public String getTranslatedLabel(String key, String languageCode, String publicationId) {
+        return edcClient.getTranslatedLabel(key, languageCode, publicationId);
+    }
+
+    @Override
     public void setServerUrl(String serverUrl) {
         edcClient.setServerUrl(serverUrl);
     }
