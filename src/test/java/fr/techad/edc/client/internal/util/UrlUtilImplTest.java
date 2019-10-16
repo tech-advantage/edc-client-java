@@ -39,14 +39,21 @@ public class UrlUtilImplTest extends CommonBase {
     @Test
     public void shouldCreateADocUrl() throws InvalidUrlException {
         UrlUtil urlUtil = createUrlBuilder();
-        String url = urlUtil.getDocumentationUrl(12L);
+        String url = urlUtil.getDocumentationUrl(12L, "fr");
+        Assert.assertEquals("https://demo.easydoccontents.com/help/doc/12/fr", url);
+    }
+
+    @Test
+    public void shouldCreateADocUrlWithNullLanguage() throws InvalidUrlException {
+        UrlUtil urlUtil = createUrlBuilder();
+        String url = urlUtil.getDocumentationUrl(12L, null);
         Assert.assertEquals("https://demo.easydoccontents.com/help/doc/12", url);
     }
 
     @Test
     public void shouldCreateADocUrlWithNull() throws InvalidUrlException {
         UrlUtil urlUtil = createUrlBuilder();
-        String url = urlUtil.getDocumentationUrl(null);
+        String url = urlUtil.getDocumentationUrl(null, null);
         Assert.assertEquals("https://demo.easydoccontents.com/help/doc/null", url);
     }
 

@@ -6,6 +6,7 @@ package fr.techad.edc.client;
 
 import fr.techad.edc.client.injector.provider.ContextItemProvider;
 import fr.techad.edc.client.injector.provider.DocumentationItemProvider;
+import fr.techad.edc.client.injector.provider.InformationProvider;
 import fr.techad.edc.client.internal.Constants;
 import fr.techad.edc.client.internal.DocumentationManagerImpl;
 import fr.techad.edc.client.internal.EdcClientImpl;
@@ -57,7 +58,8 @@ public abstract class CommonBase {
         ContextItemProvider contextItemProvider = new ContextItemProvider();
 
         DocumentationItemProvider documentationItemProvider = new DocumentationItemProvider();
-        this.edcReader = new HttpReaderImpl(httpClient, clientConfiguration, keyUtil, contextItemProvider, documentationItemProvider);
+        InformationProvider informationProvider = new InformationProvider();
+        this.edcReader = new HttpReaderImpl(httpClient, clientConfiguration, keyUtil, contextItemProvider, documentationItemProvider, informationProvider);
         return this.edcReader;
 
     }
@@ -83,6 +85,6 @@ public abstract class CommonBase {
     }
 
     protected EdcClient createEdcClient() {
-        return new EdcClientImpl(createClientConfiguration(), createDocumentationManager(), createUrlBuilder(), createTranslationManager(), createInformationManager(), createTranslationUtil());
+        return new EdcClientImpl(createClientConfiguration(), createDocumentationManager(), createUrlBuilder(), createTranslationManager(), createInformationManager());
     }
 }

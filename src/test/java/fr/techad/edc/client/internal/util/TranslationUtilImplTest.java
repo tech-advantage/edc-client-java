@@ -2,8 +2,8 @@ package fr.techad.edc.client.internal.util;
 
 import com.google.common.collect.Maps;
 import fr.techad.edc.client.CommonBase;
+import fr.techad.edc.client.injector.provider.InformationProvider;
 import fr.techad.edc.client.internal.TranslationConstants;
-import fr.techad.edc.client.internal.model.InformationImpl;
 import fr.techad.edc.client.model.Information;
 import fr.techad.edc.client.util.TranslationUtil;
 import org.junit.Assert;
@@ -18,11 +18,9 @@ public class TranslationUtilImplTest extends CommonBase {
 
     @Test
     public void shouldGetPublicationDefaultLanguages() {
-        TranslationUtil translationUtil = new TranslationUtilImpl();
-        Information information1 = new InformationImpl();
-        information1.setDefaultLanguage("fr");
-        Information information2 = new InformationImpl();
-        information2.setDefaultLanguage("ru");
+        TranslationUtil translationUtil = createTranslationUtil();
+        Information information1 = createInformation("fr");
+        Information information2 = createInformation("ru");
         Map<String, Information> informationPerPublication = Stream.of(
                 new AbstractMap.SimpleEntry<>("pub1", information1),
                 new AbstractMap.SimpleEntry<>("pub2", information2))
@@ -36,33 +34,20 @@ public class TranslationUtilImplTest extends CommonBase {
     }
 
     @Test
-    public void shouldGetDefaultLanguageIfPresent() {
-        TranslationUtil translationUtil = new TranslationUtilImpl();
-        Information information1 = new InformationImpl();
-        information1.setDefaultLanguage("fr");
-        String langCode = translationUtil.getPublicationLanguage(information1);
-        Assert.assertEquals("fr", langCode);
-    }
-
-    @Test
-    public void shouldGetSystemDefaultLanguageIfInformationNull() {
-        TranslationUtil translationUtil = new TranslationUtilImpl();
-        String langCode = translationUtil.getPublicationLanguage(null);
-        Assert.assertEquals(TranslationConstants.DEFAULT_LANGUAGE_CODE, langCode);
-    }
-
-    @Test
-    public void shouldGetSystemDefaultLanguageIfNotPresent() {
-        TranslationUtil translationUtil = new TranslationUtilImpl();
-        Information information1 = new InformationImpl();
-        information1.setDefaultLanguage("");
-        String langCode = translationUtil.getPublicationLanguage(information1);
-        Assert.assertEquals(TranslationConstants.DEFAULT_LANGUAGE_CODE, langCode);
+    public void shouldCheckIfLanguageCodeIsValid() {
+        TranslationUtil translationUtil = createTranslationUtil();
+        Assert.assertTrue(translationUtil.isLanguageCodeValid("en"));
+        Assert.assertTrue(translationUtil.isLanguageCodeValid("fr"));
+        Assert.assertFalse(translationUtil.isLanguageCodeValid(""));
+        Assert.assertFalse(translationUtil.isLanguageCodeValid("abc"));
+        Assert.assertFalse(translationUtil.isLanguageCodeValid(" fr"));
+        Assert.assertFalse(translationUtil.isLanguageCodeValid("fr "));
+        Assert.assertFalse(translationUtil.isLanguageCodeValid(null));
     }
 
     @Test
     public void shouldCheckValidTranslatedLabels() {
-        TranslationUtil translationUtil = new TranslationUtilImpl();
+        TranslationUtil translationUtil = createTranslationUtil();
         Map<String, String> labelsToCheck = createLabels("my articles label", "my links label");
         boolean isValid = translationUtil.checkTranslatedLabels(labelsToCheck);
         Assert.assertTrue(isValid);
@@ -70,7 +55,7 @@ public class TranslationUtilImplTest extends CommonBase {
 
     @Test
     public void shouldCheckInvalidTranslatedLabels() {
-        TranslationUtil translationUtil = new TranslationUtilImpl();
+        TranslationUtil translationUtil = createTranslationUtil();
         Map<String, String> labelsToCheck = createLabels("my articles label", null);
         boolean isValid = translationUtil.checkTranslatedLabels(labelsToCheck);
         Assert.assertFalse(isValid);
@@ -78,10 +63,17 @@ public class TranslationUtilImplTest extends CommonBase {
 
     @Test
     public void shouldCheckEmptyTranslatedLabels() {
-        TranslationUtil translationUtil = new TranslationUtilImpl();
+        TranslationUtil translationUtil = createTranslationUtil();
         Map<String, String> labelsToCheck = createLabels("my articles label", "");
         boolean isValid = translationUtil.checkTranslatedLabels(labelsToCheck);
         Assert.assertFalse(isValid);
+    }
+
+    private Information createInformation(String defaultLanguageCode) {
+        InformationProvider informationProvider = new InformationProvider();
+        Information information = informationProvider.get();
+        information.setDefaultLanguage(defaultLanguageCode);
+        return information;
     }
 
     private Map<String, String> createLabels(String articlesLabel, String linksLabels) {

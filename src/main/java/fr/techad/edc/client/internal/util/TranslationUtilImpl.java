@@ -17,21 +17,16 @@ public class TranslationUtilImpl implements TranslationUtil {
     }
 
     @Override
-    public String getPublicationLanguage(Information information) {
-        String defaultLang = TranslationConstants.DEFAULT_LANGUAGE_CODE;
-
-        if (information != null && StringUtils.isNotEmpty(information.getDefaultLanguage())) {
-            defaultLang = information.getDefaultLanguage();
-        }
-        return defaultLang;
-    }
-
-    @Override
     public boolean checkTranslatedLabels(Map<String, String> labels) {
         return labels != null && !labels.isEmpty() &&
                 TranslationConstants.DEFAULT_LABELS.entrySet().stream()
                         .allMatch(entry -> labels.containsKey(entry.getKey())) &&
                 labels.values().stream().allMatch(l -> StringUtils.isNotBlank(l));
+    }
+
+    @Override
+    public boolean isLanguageCodeValid(String languageCode) {
+        return TranslationConstants.LANGUAGE_CODES.contains(languageCode);
     }
 
     private String getDefaultLanguage(Information info) {

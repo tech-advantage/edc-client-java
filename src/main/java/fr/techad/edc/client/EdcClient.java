@@ -48,12 +48,14 @@ public interface EdcClient {
      * Create the url for the documentation.
      * <p>
      * The language code is 2 digits in lowercase ie fr, en, ...
+     * If languageCode is not defined or not found, system default will be used instead
      *
      * @param id the identifier of the documentation
+     * @param languageCode the 2 letters code of the language to use
      * @return the url
      * @throws InvalidUrlException If the url is malformed
      */
-    String getDocumentationWebHelpUrl(Long id) throws InvalidUrlException;
+    String getDocumentationWebHelpUrl(Long id, String languageCode) throws InvalidUrlException;
 
     /**
      * Return the context item associated with main and sub keys and the language code.
@@ -69,14 +71,21 @@ public interface EdcClient {
 
     /**
      * Return the label translation for the given key
-     * Will try to return in the requested language, or use default if content or i18n file was not found for this language
+     * Will read the translated labels from the the i18n files present in the documentation export
+     * (by default in folder doc/i18n/popover/*.json)
      *
-     * @param key the label translation key
-     * @param languageCode the language
+     * If label was not found in the requested language, it will try and read in the publication default language
+     * (as defined in the info.json file),
+     * or in global default labels as a final fallback
+     *
+     * @param labelKey the label translation key
+     * @param languageCode the 2 letters language code
      * @param publicationId default language, to use if content was not found in requested language
      * @return the translated label
+     * @throws IOException         if an error occurred when reading the files
+     * @throws InvalidUrlException if the url is malformed
      */
-    String getTranslatedLabel(String key, String languageCode, String publicationId);
+    String getLabel(String labelKey, String languageCode, String publicationId) throws IOException, InvalidUrlException;
 
     /**
      * Define the server url like http://localhost:8080
@@ -104,7 +113,7 @@ public interface EdcClient {
     void setWebHelpContextUrl(String webHelpContextUrl) throws InvalidUrlException;
 
     /**
-     * Force the manager to reload the documentation definition.
+     * Force the manager to reload the documentation definition, publication information and translations.
      */
     void forceReload();
 

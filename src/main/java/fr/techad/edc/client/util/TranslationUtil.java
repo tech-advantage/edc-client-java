@@ -15,14 +15,6 @@ public interface TranslationUtil {
     Map<String, String> getPublicationDefaultLanguages(Map<String, Information> information);
 
     /**
-     * Return the publication default language code from the information
-     *
-     * @param info the information containing the default language code
-     * @return the default language code if found
-     */
-    String getPublicationLanguage(Information info);
-
-    /**
      * Check labels consistency
      * Labels must contain all the keys present in default language labels
      * And their values must not be empty
@@ -31,4 +23,12 @@ public interface TranslationUtil {
      * @return true if labels are valid
      */
     boolean checkTranslatedLabels(Map<String, String> labels);
+
+    /**
+     * Return true if given language code is present in the list of the codes used in the application
+     *
+     * @param languageCode the language code to check
+     * @return true if code is present
+     */
+    boolean isLanguageCodeValid(String languageCode);
 }

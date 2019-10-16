@@ -17,27 +17,19 @@ import java.util.Map;
 public interface DocumentationManager {
 
     /**
-     * Get the context item according to the keys and the language. If the context was not read, it will read.
+     * Get the context item according to the keys and the language or the default language if not found.
+     * If the context was not found in the requested language, it will find the publication from the given keys
+     * and use the default language, identified from the the default languages map
      *
      * @param mainKey      the main key
      * @param subKey       the sub key
      * @param languageCode the language code
+     * @param defaultLanguages a map containing the publication id as key and default language code as value
      * @return the context item or null
      * @throws IOException         if an is occurred on reading information
      * @throws InvalidUrlException if the url is malformed.
      */
-    ContextItem getContext(String mainKey, String subKey, String languageCode) throws IOException, InvalidUrlException;
-
-    /**
-     * Return the default language context item for the given keys,
-     * Based on the publication default language
-     *
-     * @param mainKey the mainKey
-     * @param subKey the subKey
-     * @param defaultLangCodes a map containing the publication id as key and default language code as value
-     * @return the context item in the default language of the publication
-     */
-    ContextItem findDefaultContextItem(String mainKey, String subKey, Map<String, String> defaultLangCodes);
+    ContextItem getContext(String mainKey, String subKey, String languageCode, Map<String, String> defaultLanguages) throws IOException, InvalidUrlException;
 
     /**
      * Force the reload of the documentation definition on the next call.

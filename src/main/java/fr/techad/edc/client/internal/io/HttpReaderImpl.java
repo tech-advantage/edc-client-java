@@ -14,10 +14,10 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import fr.techad.edc.client.injector.provider.ContextItemProvider;
 import fr.techad.edc.client.injector.provider.DocumentationItemProvider;
+import fr.techad.edc.client.injector.provider.InformationProvider;
 import fr.techad.edc.client.internal.TranslationConstants;
 import fr.techad.edc.client.internal.http.Error4xxException;
 import fr.techad.edc.client.internal.http.HttpClient;
-import fr.techad.edc.client.internal.model.InformationImpl;
 import fr.techad.edc.client.io.EdcReader;
 import fr.techad.edc.client.model.ClientConfiguration;
 import fr.techad.edc.client.model.ContextItem;
@@ -57,16 +57,18 @@ public class HttpReaderImpl implements EdcReader {
     private KeyUtil keyUtil;
     private DocumentationItemProvider documentationItemProvider;
     private ContextItemProvider contextItemProvider;
-    private Set<String> storedPublicationIds;
+    private InformationProvider informationProvider;
 
     @Inject
     public HttpReaderImpl(HttpClient client, ClientConfiguration clientConfiguration, KeyUtil keyUtil,
-                          ContextItemProvider contextItemProvider, DocumentationItemProvider documentationItemProvider) {
+                          ContextItemProvider contextItemProvider, DocumentationItemProvider documentationItemProvider,
+                          InformationProvider informationProvider) {
         this.client = client;
         this.clientConfiguration = clientConfiguration;
         this.keyUtil = keyUtil;
         this.documentationItemProvider = documentationItemProvider;
         this.contextItemProvider = contextItemProvider;
+        this.informationProvider = informationProvider;
     }
 
     @Override
@@ -89,14 +91,17 @@ public class HttpReaderImpl implements EdcReader {
     }
 
     @Override
-    public Map<String, String> readLabels(String languageCode) throws IOException, InvalidUrlException {
-        return readLabelsForLang(languageCode);
+    public Map<String, Map<String, String>> readLabels(Set<String> languageCodes) throws IOException, InvalidUrlException {
+        Map<String, Map<String, String>> labels = Maps.newHashMap();
+        if (languageCodes != null) {
+            for (String languageCode : languageCodes) {
+                labels.put(languageCode, readLabelsForLang(languageCode));
+            }
+        }
+        return labels;
     }
 
     private Set<String> readPublicationIds() throws InvalidUrlException, IOException {
-        if (this.storedPublicationIds != null && !this.storedPublicationIds.isEmpty()) {
-            return this.storedPublicationIds;
-        }
         Set<String> publicationIds = Sets.newHashSet();
         String multiDocUrl = StringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + MULTI_DOC_FILE;
         LOGGER.info("Context url: {}", multiDocUrl);
@@ -117,7 +122,6 @@ public class HttpReaderImpl implements EdcReader {
                 }
             }
         }
-        this.storedPublicationIds = publicationIds;
         return publicationIds;
     }
 
@@ -146,7 +150,7 @@ public class HttpReaderImpl implements EdcReader {
         String infoFileUrl = StringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + publicationId + "/" + INFO_FILE;
         LOGGER.debug("Reading info.json file from url {}", infoFileUrl);
         String infoContent;
-        Information information = new InformationImpl();
+        Information information = informationProvider.get();
 
         try {
             infoContent = client.get(infoFileUrl);
@@ -163,13 +167,22 @@ public class HttpReaderImpl implements EdcReader {
                 JsonElement presentLanguages = infoSrc.get("languages");
                 if (presentLanguages != null) {
                     JsonArray languagesSrc = presentLanguages.getAsJsonArray();
-                    languagesSrc.forEach(lang -> languages.add(lang.toString()));
+                    languagesSrc.forEach(lang -> {
+                        if (lang != null && StringUtils.isNotBlank(lang.getAsString()))
+                            languages.add(lang.getAsString());
+                    });
                 }
                 LOGGER.debug("Setting languages from info.json : {}", languages);
                 information.setLanguages(languages);
             }
         } catch (Error4xxException e) {
             LOGGER.error("Could not initialize info from info.json for publication id : {}", publicationId, e);
+        } finally {
+            if (StringUtils.isBlank(information.getDefaultLanguage()))
+                information.setDefaultLanguage(TranslationConstants.DEFAULT_LANGUAGE_CODE);
+            if (information.getLanguages() == null || information.getLanguages().isEmpty())
+                information.setLanguages(Sets.newHashSet(TranslationConstants.DEFAULT_LANGUAGE_CODE));
+            LOGGER.debug("Created information from info.json : {}", information);
         }
 
         return information;

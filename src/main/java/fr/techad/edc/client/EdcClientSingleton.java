@@ -62,8 +62,8 @@ public class EdcClientSingleton implements EdcClient {
     }
 
     @Override
-    public String getDocumentationWebHelpUrl(Long id) throws InvalidUrlException {
-        return edcClient.getDocumentationWebHelpUrl(id);
+    public String getDocumentationWebHelpUrl(Long id, String languageCode) throws InvalidUrlException {
+        return edcClient.getDocumentationWebHelpUrl(id, languageCode);
     }
 
     @Override
@@ -72,8 +72,8 @@ public class EdcClientSingleton implements EdcClient {
     }
 
     @Override
-    public String getTranslatedLabel(String key, String languageCode, String publicationId) {
-        return edcClient.getTranslatedLabel(key, languageCode, publicationId);
+    public String getLabel(String labelKey, String languageCode, String publicationId) throws IOException, InvalidUrlException {
+        return edcClient.getLabel(labelKey, languageCode, publicationId);
     }
 
     @Override

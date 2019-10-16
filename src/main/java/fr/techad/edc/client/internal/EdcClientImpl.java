@@ -11,14 +11,12 @@ import fr.techad.edc.client.TranslationManager;
 import fr.techad.edc.client.model.ClientConfiguration;
 import fr.techad.edc.client.model.ContextItem;
 import fr.techad.edc.client.model.InvalidUrlException;
-import fr.techad.edc.client.util.TranslationUtil;
 import fr.techad.edc.client.util.UrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * TECH ADVANTAGE
@@ -32,18 +30,15 @@ public class EdcClientImpl implements EdcClient {
     private TranslationManager translationManager;
     private InformationManager informationManager;
     private UrlUtil urlUtil;
-    private TranslationUtil translationUtil;
 
     @Inject
     public EdcClientImpl(ClientConfiguration clientConfiguration, DocumentationManager documentationManager,
-                         UrlUtil urlUtil, TranslationManager translationManager, InformationManager informationManager,
-                         TranslationUtil translationUtil) {
+                         UrlUtil urlUtil, TranslationManager translationManager, InformationManager informationManager) {
         this.clientConfiguration = clientConfiguration;
         this.documentationManager = documentationManager;
         this.translationManager = translationManager;
         this.informationManager = informationManager;
         this.urlUtil = urlUtil;
-        this.translationUtil = translationUtil;
     }
 
     @Override
@@ -55,8 +50,8 @@ public class EdcClientImpl implements EdcClient {
     @Override
     public String getContextWebHelpUrl(String mainKey, String subKey, int rank, String languageCode) throws IOException, InvalidUrlException {
         LOGGER.debug("Get WebHelp Context item with mainKey: {}, subKey: {}, languageCode:{}", mainKey, subKey, languageCode);
-        String url = null;
-        ContextItem context = documentationManager.getContext(mainKey, subKey, languageCode);
+        String url;
+        ContextItem context = documentationManager.getContext(mainKey, subKey, languageCode, translationManager.getDefaultPublicationLanguages());
         if (context != null && (context.articleSize() > 0 || context.linkSize() > 0)) {
             url = urlUtil.getContextUrl(context.getPublicationId(), mainKey, subKey, languageCode, rank);
         } else {
@@ -67,10 +62,10 @@ public class EdcClientImpl implements EdcClient {
     }
 
     @Override
-    public String getDocumentationWebHelpUrl(Long id) throws InvalidUrlException {
+    public String getDocumentationWebHelpUrl(Long id, String languageCode) throws InvalidUrlException {
         String url;
         if (id != null)
-            url = urlUtil.getDocumentationUrl(id);
+            url = urlUtil.getDocumentationUrl(id, languageCode);
         else
             url = urlUtil.getHomeUrl();
         return url;
@@ -79,30 +74,17 @@ public class EdcClientImpl implements EdcClient {
     @Override
     public ContextItem getContextItem(String mainKey, String subKey, String languageCode) throws IOException, InvalidUrlException {
         LOGGER.debug("Get WebHelp Context item with mainKey: {}, subKey: {}, languageCode:{}", mainKey, subKey, languageCode);
-        ContextItem context = documentationManager.getContext(mainKey, subKey, languageCode);
-        if (context == null) {
-            context = findDefaultContextItem(mainKey, subKey);
-        }
-        return context;
+        // Make sure context was previously loaded - including information and translations
+        loadContext();
+        return documentationManager.getContext(mainKey, subKey, languageCode, translationManager.getDefaultPublicationLanguages());
     }
 
     @Override
-    public String getTranslatedLabel(String key, String languageCode, String publicationId) {
-        String translatedLabel = "";
-        try {
-            String publicationLanguage = translationUtil.getPublicationLanguage(informationManager.findByPublicationId(publicationId));
-            translatedLabel = translationManager.getLabel(key, languageCode, publicationLanguage);
-
-        } catch (IOException e) {
-            LOGGER.error("Could not get the translated label for key {}, language code {} and publication id {}", key, languageCode, publicationId, e);
-        } catch (InvalidUrlException e) {
-            LOGGER.error("Invalid url while getting the translated label for key {}, language code {} and publication id {}", key, languageCode, publicationId, e);
-        } finally {
-            if (translatedLabel == null) {
-                translatedLabel = TranslationConstants.DEFAULT_LABELS.get(key);
-            }
-        }
-        return translatedLabel;
+    public String getLabel(String labelKey, String languageCode, String publicationId) throws IOException, InvalidUrlException {
+        LOGGER.debug("Getting label for key {}, language code {} and publication id {}", labelKey, languageCode, publicationId);
+        // Make sure the whole context was previously loaded
+        loadContext();
+        return translationManager.getLabel(labelKey, languageCode, publicationId);
     }
 
     @Override
@@ -126,18 +108,16 @@ public class EdcClientImpl implements EdcClient {
     @Override
     public void forceReload() {
         LOGGER.debug("Force reload");
+        informationManager.forceReload();
+        translationManager.forceReload();
         documentationManager.forceReload();
     }
 
     @Override
     public void loadContext() throws IOException, InvalidUrlException {
         LOGGER.debug("Loading of the configuration");
+        informationManager.loadInformation();
+        translationManager.loadTranslations(informationManager.getPublicationInformation());
         documentationManager.loadContext();
-    }
-
-    private ContextItem findDefaultContextItem(String mainKey, String subKey) throws IOException, InvalidUrlException {
-        LOGGER.debug("Finding default context item for mainKey {} subKey {}", mainKey, subKey);
-        Map<String, String> defaultLanguages = this.translationUtil.getPublicationDefaultLanguages(this.informationManager.getPublicationInformation());
-        return documentationManager.findDefaultContextItem(mainKey, subKey, defaultLanguages);
     }
 }

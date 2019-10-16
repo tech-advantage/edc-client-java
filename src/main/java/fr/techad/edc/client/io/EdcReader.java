@@ -10,6 +10,7 @@ import fr.techad.edc.client.model.InvalidUrlException;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * IO Utility to read all information of edc. In generally, it's the export.
@@ -26,7 +27,8 @@ public interface EdcReader {
     Map<String, ContextItem> readContext() throws IOException, InvalidUrlException;
 
     /**
-     * Read the export information
+     * Read the export information, for every publication, from the info.json files
+     * The key of the returned map is the publication id and the value the associated information object
      *
      * @return a map containing the keys and label translations associated
      * @throws IOException if an error occurred during the read
@@ -35,12 +37,12 @@ public interface EdcReader {
     Map<String, Information> readInfo() throws IOException, InvalidUrlException;
 
     /**
-     * Read the translated popover labels
+     * Read the translated popover labels for the given language codes
      *
-     * @param languageCode the language code to get
+     * @param languageCodes the languages code to read
      * @return a map containing the keys and label translations associated
      * @throws IOException if an error occurred during the read
      * @throws InvalidUrlException if the url is malformed
      */
-    Map<String, String> readLabels(String languageCode) throws IOException, InvalidUrlException;
+    Map<String, Map<String, String>> readLabels(Set<String> languageCodes) throws IOException, InvalidUrlException;
 }

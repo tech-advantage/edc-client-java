@@ -5,15 +5,19 @@ import fr.techad.edc.client.InformationManager;
 import fr.techad.edc.client.io.EdcReader;
 import fr.techad.edc.client.model.Information;
 import fr.techad.edc.client.model.InvalidUrlException;
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 public class InformationManagerImpl implements InformationManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(InformationManager.class);
     private EdcReader reader;
 
+    // Map containing the information for each publication Id
     private Map<String, Information> information = Maps.newHashMap();
 
     @Inject
@@ -22,22 +26,21 @@ public class InformationManagerImpl implements InformationManager {
     }
 
     @Override
-    public Map<String, Information> getPublicationInformation() throws IOException, InvalidUrlException {
-        if (this.information == null || this.information.isEmpty()) {
-            this.information = this.reader.readInfo();
+    public void loadInformation() throws IOException, InvalidUrlException {
+        if (this.information.isEmpty()) {
+            this.information.putAll(this.reader.readInfo());
+            LOGGER.debug("Information loaded {}", this.information);
         }
-        return this.information;
     }
 
     @Override
-    public Information findByPublicationId(String publicationId) throws IOException, InvalidUrlException {
-        if (StringUtils.isEmpty(publicationId)) {
-            return null;
-        }
-        return this.getPublicationInformation().entrySet().stream()
-                .filter(e -> publicationId.equals(e.getKey()))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
+    public void forceReload() {
+        this.information.clear();
+        LOGGER.debug("Information cleared, will be ");
+    }
+
+    @Override
+    public Map<String, Information> getPublicationInformation() {
+        return Collections.unmodifiableMap(this.information);
     }
 }

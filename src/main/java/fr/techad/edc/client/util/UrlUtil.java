@@ -42,11 +42,12 @@ public interface UrlUtil {
 
 
     /**
-     * Build the web help documentation url for the document defined by the identifier
+     * Build the web help documentation url for the document defined by the identifier and the language code if present
      *
      * @param id the idenitifer of the documentation
+     * @param languageCode the 2 letters code of the language (en, fr..)
      * @return the url
      * @throws InvalidUrlException If the url is malformed
      */
-    String getDocumentationUrl(Long id) throws InvalidUrlException;
+    String getDocumentationUrl(Long id, String languageCode) throws InvalidUrlException;
 }
