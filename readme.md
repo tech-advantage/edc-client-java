@@ -16,7 +16,7 @@ You can pull it from the central Maven repositories:
 <dependency>
   <groupId>fr.techad</groupId>
   <artifactId>edc-client</artifactId>
-  <version>2.2.0</version>
+  <version>2.4.0-SNAPSHOT</version>
 </dependency>
 ```
 

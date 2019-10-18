@@ -62,13 +62,18 @@ public class EdcClientSingleton implements EdcClient {
     }
 
     @Override
-    public String getDocumentationWebHelpUrl(Long id) throws InvalidUrlException {
-        return edcClient.getDocumentationWebHelpUrl(id);
+    public String getDocumentationWebHelpUrl(Long id, String languageCode) throws InvalidUrlException {
+        return edcClient.getDocumentationWebHelpUrl(id, languageCode);
     }
 
     @Override
     public ContextItem getContextItem(String mainKey, String subKey, String languageCode) throws IOException, InvalidUrlException {
         return edcClient.getContextItem(mainKey, subKey, languageCode);
+    }
+
+    @Override
+    public String getLabel(String labelKey, String languageCode, String publicationId) throws IOException, InvalidUrlException {
+        return edcClient.getLabel(labelKey, languageCode, publicationId);
     }
 
     @Override

@@ -39,10 +39,10 @@ public class HttpReaderImplTest extends CommonBase {
         Map<String, ContextItem> contextItemMap = edcReader.readContext();
         Assert.assertEquals(31, contextItemMap.size());
         ContextItem contextItem = contextItemMap.get(keyUtil.getKey("fr.techad.edc", "help.center", "en"));
-        Assert.assertEquals("All you need about edc.", contextItem.getDescription());
+        Assert.assertEquals("All you need about edc", contextItem.getDescription());
         Assert.assertEquals("About edc", contextItem.getLabel());
         Assert.assertEquals("en", contextItem.getLanguageCode());
-        Assert.assertEquals("edchelp/html/en/1/2712/index.html", contextItem.getUrl());
+        Assert.assertEquals("edchelp/html/en/1/7868/index.html", contextItem.getUrl());
         Assert.assertEquals(1, contextItem.articleSize());
         Assert.assertEquals(3, contextItem.linkSize());
 

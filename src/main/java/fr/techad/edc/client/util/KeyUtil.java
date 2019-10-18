@@ -19,4 +19,14 @@ public interface KeyUtil {
      * @return the key
      */
     String getKey(String mainKey, String subKey, String languageCode);
+
+    /**
+     * Check if the full key contains the main and subKey
+     *
+     * @param fullKey the full key, containing keys and language code
+     * @param mainKey a main key
+     * @param subKey a sub key
+     * @return returns true if mainKey.subKey is present for any language
+     */
+    boolean containsKey(String fullKey, String mainKey, String subKey);
 }
