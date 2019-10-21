@@ -298,8 +298,8 @@ public class HttpReaderImpl implements EdcReader {
                 JsonObject jsonObject = jsonContent.getAsJsonObject().get(I18N_LABELS_ROOT).getAsJsonObject();
                 labels = jsonObject.entrySet().stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, e -> {
-                            LOGGER.debug("creating map entry for key: {} and value {}", e.getKey(), e.getValue().toString());
-                            return e.getValue().toString();
+                            LOGGER.debug("Creating map entry for key: {} and value {}", e.getKey(), e.getValue().getAsString());
+                            return e.getValue().getAsString();
                         }));
             }
         } catch (Error4xxException e) {
