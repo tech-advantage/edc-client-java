@@ -49,13 +49,15 @@ public interface EdcClient {
      * <p>
      * The language code is 2 digits in lowercase ie fr, en, ...
      * If languageCode is not defined or not found, system default will be used instead
+     * Url will include the identifier of publication from where the navigation started, if present
      *
      * @param id the identifier of the documentation
      * @param languageCode the 2 letters code of the language to use
+     * @param srcPublicationId the identifier of the publication where the navigation starts from
      * @return the url
      * @throws InvalidUrlException If the url is malformed
      */
-    String getDocumentationWebHelpUrl(Long id, String languageCode) throws InvalidUrlException;
+    String getDocumentationWebHelpUrl(Long id, String languageCode, String srcPublicationId) throws InvalidUrlException;
 
     /**
      * Return the context item associated with main and sub keys and the language code.
