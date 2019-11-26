@@ -62,10 +62,10 @@ public class EdcClientImpl implements EdcClient {
     }
 
     @Override
-    public String getDocumentationWebHelpUrl(Long id, String languageCode) throws InvalidUrlException {
+    public String getDocumentationWebHelpUrl(Long id, String languageCode, String srcPublicationId) throws InvalidUrlException {
         String url;
         if (id != null)
-            url = urlUtil.getDocumentationUrl(id, languageCode);
+            url = urlUtil.getDocumentationUrl(id, languageCode, srcPublicationId);
         else
             url = urlUtil.getHomeUrl();
         return url;

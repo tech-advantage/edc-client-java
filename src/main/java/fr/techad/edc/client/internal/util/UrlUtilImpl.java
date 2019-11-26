@@ -41,8 +41,9 @@ public class UrlUtilImpl implements UrlUtil {
     }
 
     @Override
-    public String getDocumentationUrl(Long id, String languageCode) throws InvalidUrlException {
+    public String getDocumentationUrl(Long id, String languageCode, String srcPublicationId) throws InvalidUrlException {
         String langCode = StringUtils.isNotBlank(languageCode) ? "/" + languageCode : "";
-        return clientConfiguration.getWebHelpUrl() + "/doc/" + id + langCode;
+        String publicationId = StringUtils.isNotBlank(srcPublicationId) ? srcPublicationId + "/" : "";
+        return clientConfiguration.getWebHelpUrl() + "/doc/" + publicationId + id + langCode;
     }
 }

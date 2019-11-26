@@ -62,8 +62,8 @@ public class EdcClientSingleton implements EdcClient {
     }
 
     @Override
-    public String getDocumentationWebHelpUrl(Long id, String languageCode) throws InvalidUrlException {
-        return edcClient.getDocumentationWebHelpUrl(id, languageCode);
+    public String getDocumentationWebHelpUrl(Long id, String languageCode, String srcPublicationId) throws InvalidUrlException {
+        return edcClient.getDocumentationWebHelpUrl(id, languageCode, srcPublicationId);
     }
 
     @Override

@@ -49,13 +49,19 @@ public class EdcClientImplTest extends CommonBase {
 
     @Test
     public void shouldGetDocumentationUrl() throws InvalidUrlException {
-        String documentationWebHelpUrl = edcClient.getDocumentationWebHelpUrl(434L, "ru");
-        Assert.assertEquals("https://demo.easydoccontents.com/help/doc/434/ru", documentationWebHelpUrl);
+        String documentationWebHelpUrl = edcClient.getDocumentationWebHelpUrl(434L, "ru", "myPluginId");
+        Assert.assertEquals("https://demo.easydoccontents.com/help/doc/myPluginId/434/ru", documentationWebHelpUrl);
     }
 
     @Test
     public void shouldGetDocumentationUrlWithNullLanguage() throws InvalidUrlException {
-        String documentationWebHelpUrl = edcClient.getDocumentationWebHelpUrl(434L, null);
+        String documentationWebHelpUrl = edcClient.getDocumentationWebHelpUrl(434L, null, "myPluginId");
+        Assert.assertEquals("https://demo.easydoccontents.com/help/doc/myPluginId/434", documentationWebHelpUrl);
+    }
+
+    @Test
+    public void shouldGetDocumentationUrlWithNullPublicationId() throws InvalidUrlException {
+        String documentationWebHelpUrl = edcClient.getDocumentationWebHelpUrl(434L, null, null);
         Assert.assertEquals("https://demo.easydoccontents.com/help/doc/434", documentationWebHelpUrl);
     }
 
