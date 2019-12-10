@@ -7,6 +7,7 @@ package fr.techad.edc.client.internal.util;
 import fr.techad.edc.client.model.ClientConfiguration;
 import fr.techad.edc.client.model.InvalidUrlException;
 import fr.techad.edc.client.util.UrlUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 
@@ -40,7 +41,9 @@ public class UrlUtilImpl implements UrlUtil {
     }
 
     @Override
-    public String getDocumentationUrl(Long id) throws InvalidUrlException {
-        return clientConfiguration.getWebHelpUrl() + "/doc/" + id;
+    public String getDocumentationUrl(Long id, String languageCode, String srcPublicationId) throws InvalidUrlException {
+        String langCode = StringUtils.isNotBlank(languageCode) ? "/" + languageCode : "";
+        String publicationId = StringUtils.isNotBlank(srcPublicationId) ? srcPublicationId + "/" : "";
+        return clientConfiguration.getWebHelpUrl() + "/doc/" + publicationId + id + langCode;
     }
 }

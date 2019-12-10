@@ -42,11 +42,14 @@ public interface UrlUtil {
 
 
     /**
-     * Build the web help documentation url for the document defined by the identifier
+     * Build the web help documentation url for the document defined by the identifier, the language code,
+     * and the publication identifier if present
      *
      * @param id the idenitifer of the documentation
+     * @param languageCode the 2 letters code of the language (en, fr..)
+     * @param srcPublicationId the identifier of the publication from where navigation will start
      * @return the url
      * @throws InvalidUrlException If the url is malformed
      */
-    String getDocumentationUrl(Long id) throws InvalidUrlException;
+    String getDocumentationUrl(Long id, String languageCode, String srcPublicationId) throws InvalidUrlException;
 }

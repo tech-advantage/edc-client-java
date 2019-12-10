@@ -8,19 +8,25 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import fr.techad.edc.client.DocumentationManager;
 import fr.techad.edc.client.EdcClient;
+import fr.techad.edc.client.InformationManager;
+import fr.techad.edc.client.TranslationManager;
 import fr.techad.edc.client.injector.provider.ContextItemProvider;
 import fr.techad.edc.client.injector.provider.DocumentationItemProvider;
 import fr.techad.edc.client.internal.DocumentationManagerImpl;
 import fr.techad.edc.client.internal.EdcClientImpl;
+import fr.techad.edc.client.internal.InformationManagerImpl;
+import fr.techad.edc.client.internal.TranslationManagerImpl;
 import fr.techad.edc.client.internal.io.HttpReaderImpl;
 import fr.techad.edc.client.internal.model.ClientConfigurationImpl;
 import fr.techad.edc.client.internal.util.KeyUtilImpl;
+import fr.techad.edc.client.internal.util.TranslationUtilImpl;
 import fr.techad.edc.client.internal.util.UrlUtilImpl;
 import fr.techad.edc.client.io.EdcReader;
 import fr.techad.edc.client.model.ClientConfiguration;
 import fr.techad.edc.client.model.ContextItem;
 import fr.techad.edc.client.model.DocumentationItem;
 import fr.techad.edc.client.util.KeyUtil;
+import fr.techad.edc.client.util.TranslationUtil;
 import fr.techad.edc.client.util.UrlUtil;
 
 /**
@@ -31,10 +37,13 @@ public class EdcClientModule extends AbstractModule {
     protected void configure() {
         bind(EdcClient.class).to(EdcClientImpl.class).in(Scopes.SINGLETON);
         bind(DocumentationManager.class).to(DocumentationManagerImpl.class).in(Scopes.SINGLETON);
+        bind(TranslationManager.class).to(TranslationManagerImpl.class).in(Scopes.SINGLETON);
+        bind(InformationManager.class).to(InformationManagerImpl.class).in(Scopes.SINGLETON);
 
         // Utils
         bind(KeyUtil.class).to(KeyUtilImpl.class).in(Scopes.SINGLETON);
         bind(UrlUtil.class).to(UrlUtilImpl.class);
+        bind(TranslationUtil.class).to(TranslationUtilImpl.class);
 
         // io
         bind(EdcReader.class).to(HttpReaderImpl.class);

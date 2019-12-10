@@ -14,6 +14,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import fr.techad.edc.client.injector.provider.ContextItemProvider;
 import fr.techad.edc.client.injector.provider.DocumentationItemProvider;
+import fr.techad.edc.client.injector.provider.InformationProvider;
+import fr.techad.edc.client.internal.TranslationConstants;
 import fr.techad.edc.client.internal.http.Error4xxException;
 import fr.techad.edc.client.internal.http.HttpClient;
 import fr.techad.edc.client.io.EdcReader;
@@ -21,6 +23,7 @@ import fr.techad.edc.client.model.ClientConfiguration;
 import fr.techad.edc.client.model.ContextItem;
 import fr.techad.edc.client.model.DocumentationItem;
 import fr.techad.edc.client.model.DocumentationItemType;
+import fr.techad.edc.client.model.Information;
 import fr.techad.edc.client.model.InvalidUrlException;
 import fr.techad.edc.client.util.KeyUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +34,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implement EdcReader to communicate with a server
@@ -41,6 +45,11 @@ public class HttpReaderImpl implements EdcReader {
      */
     private static final String MULTI_DOC_FILE = "multi-doc.json";
     private static final String CONTEXT_FILE = "context.json";
+    private static final String INFO_FILE = "info.json";
+
+    private static final String POPOVER_I18N_PATH = "i18n/popover/";
+    private static final String I18N_FILE_EXTENSION = ".json";
+    private static final String I18N_LABELS_ROOT = "labels";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpReaderImpl.class);
     private HttpClient client;
@@ -48,15 +57,28 @@ public class HttpReaderImpl implements EdcReader {
     private KeyUtil keyUtil;
     private DocumentationItemProvider documentationItemProvider;
     private ContextItemProvider contextItemProvider;
+    private InformationProvider informationProvider;
 
     @Inject
-    public HttpReaderImpl(HttpClient client, ClientConfiguration clientConfiguration, KeyUtil keyUtil, ContextItemProvider contextItemProvider,
-                          DocumentationItemProvider documentationItemProvider) {
+    public HttpReaderImpl(HttpClient client, ClientConfiguration clientConfiguration, KeyUtil keyUtil,
+                          ContextItemProvider contextItemProvider, DocumentationItemProvider documentationItemProvider,
+                          InformationProvider informationProvider) {
         this.client = client;
         this.clientConfiguration = clientConfiguration;
         this.keyUtil = keyUtil;
         this.documentationItemProvider = documentationItemProvider;
         this.contextItemProvider = contextItemProvider;
+        this.informationProvider = informationProvider;
+    }
+
+    @Override
+    public Map<String, Information> readInfo() throws IOException, InvalidUrlException {
+        Map<String, Information> information = Maps.newHashMap();
+        for (String publicationId : readPublicationIds()) {
+            Information info = readInfoFile(publicationId);
+            information.put(publicationId, info);
+        }
+        return information;
     }
 
     @Override
@@ -66,6 +88,17 @@ public class HttpReaderImpl implements EdcReader {
             contexts.putAll(readContext(publicationId));
         }
         return contexts;
+    }
+
+    @Override
+    public Map<String, Map<String, String>> readLabels(Set<String> languageCodes) throws IOException, InvalidUrlException {
+        Map<String, Map<String, String>> labels = Maps.newHashMap();
+        if (languageCodes != null) {
+            for (String languageCode : languageCodes) {
+                labels.put(languageCode, readLabelsForLang(languageCode));
+            }
+        }
+        return labels;
     }
 
     private Set<String> readPublicationIds() throws InvalidUrlException, IOException {
@@ -111,6 +144,48 @@ public class HttpReaderImpl implements EdcReader {
             LOGGER.warn("No context found, the product was not published", e);
         }
         return contexts;
+    }
+
+    private Information readInfoFile(String publicationId) throws IOException, InvalidUrlException {
+        String infoFileUrl = StringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + publicationId + "/" + INFO_FILE;
+        LOGGER.debug("Reading info.json file from url {}", infoFileUrl);
+        String infoContent;
+        Information information = informationProvider.get();
+
+        try {
+            infoContent = client.get(infoFileUrl);
+            JsonElement jsonContent = parseString(infoContent);
+            LOGGER.debug("Fetched content from info.json file {}", jsonContent);
+
+            if (jsonContent.isJsonObject()) {
+                JsonObject infoSrc = jsonContent.getAsJsonObject();
+                String defaultLangCode = infoSrc.get("defaultLanguage") != null ? infoSrc.get("defaultLanguage").getAsString() : TranslationConstants.DEFAULT_LANGUAGE_CODE;
+                information.setDefaultLanguage(defaultLangCode);
+                LOGGER.debug("Setting default Language from info.json : {}", defaultLangCode);
+
+                Set<String> languages = Sets.newHashSet();
+                JsonElement presentLanguages = infoSrc.get("languages");
+                if (presentLanguages != null) {
+                    JsonArray languagesSrc = presentLanguages.getAsJsonArray();
+                    languagesSrc.forEach(lang -> {
+                        if (lang != null && StringUtils.isNotBlank(lang.getAsString()))
+                            languages.add(lang.getAsString());
+                    });
+                }
+                LOGGER.debug("Setting languages from info.json : {}", languages);
+                information.setLanguages(languages);
+            }
+        } catch (Error4xxException e) {
+            LOGGER.error("Could not initialize info from info.json for publication id : {}", publicationId, e);
+        } finally {
+            if (StringUtils.isBlank(information.getDefaultLanguage()))
+                information.setDefaultLanguage(TranslationConstants.DEFAULT_LANGUAGE_CODE);
+            if (information.getLanguages() == null || information.getLanguages().isEmpty())
+                information.setLanguages(Sets.newHashSet(TranslationConstants.DEFAULT_LANGUAGE_CODE));
+            LOGGER.debug("Created information from info.json : {}", information);
+        }
+
+        return information;
     }
 
     private JsonElement parseString(String text) throws IOException {
@@ -204,5 +279,35 @@ public class HttpReaderImpl implements EdcReader {
 
     }
 
+    private Map<String, String> readLabelsForLang(String languageCode) throws IOException, InvalidUrlException {
+        Map<String, String> labels = Maps.newHashMap();
+        String label;
+
+        String relativePath = POPOVER_I18N_PATH + languageCode + I18N_FILE_EXTENSION;
+        String labelUrl = StringUtils.appendIfMissing(this.clientConfiguration.getDocumentationUrl(), "/") + relativePath;
+        LOGGER.debug("Reading labels for lang {}, url {}, labelUrl {}", languageCode, relativePath, labelUrl);
+
+        try {
+            // Get the file content (.json) for the language
+            label = client.get(labelUrl);
+            LOGGER.debug("Retrieved label: {}", label);
+            // Decode Json
+            JsonElement jsonContent = parseString(label);
+            if (jsonContent.isJsonObject() && jsonContent.getAsJsonObject().get(I18N_LABELS_ROOT) != null
+                    && jsonContent.getAsJsonObject().get(I18N_LABELS_ROOT).getAsJsonObject().isJsonObject()) {
+                JsonObject jsonObject = jsonContent.getAsJsonObject().get(I18N_LABELS_ROOT).getAsJsonObject();
+                labels = jsonObject.entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> {
+                            LOGGER.debug("Creating map entry for key: {} and value {}", e.getKey(), e.getValue().getAsString());
+                            return e.getValue().getAsString();
+                        }));
+            }
+        } catch (Error4xxException e) {
+            LOGGER.error("Could not read the labels for the lang {}, err {}", languageCode, e);
+        }
+
+        LOGGER.debug("Returning labels for lang {}, labels {}", languageCode, labels);
+        return labels;
+    }
 
 }
