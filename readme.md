@@ -5,7 +5,7 @@ This client read informations from defined url. The developer will be able to ge
 
 ## edc Version
 
-Current release is compatible with edc v2.1+
+Current release is compatible with edc v3.0+
 
 ## How can I get the latest release?
 
@@ -16,7 +16,7 @@ You can pull it from the central Maven repositories:
 <dependency>
   <groupId>fr.techad</groupId>
   <artifactId>edc-client</artifactId>
-  <version>2.4.0-SNAPSHOT</version>
+  <version>3.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
