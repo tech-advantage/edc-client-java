@@ -16,13 +16,13 @@ You can pull it from the central Maven repositories:
 <dependency>
   <groupId>fr.techad</groupId>
   <artifactId>edc-client</artifactId>
-  <version>3.0.0-SNAPSHOT</version>
+  <version>3.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-    compile group: 'fr.techad', name: 'edc-client', version: '2.2.0'
+    compile group: 'fr.techad', name: 'edc-client', version: '3.1.0-SNAPSHOT'
 ```
 
 ## Configuration
