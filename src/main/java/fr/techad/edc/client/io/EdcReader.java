@@ -45,4 +45,14 @@ public interface EdcReader {
      * @throws InvalidUrlException if the url is malformed
      */
     Map<String, Map<String, String>> readLabels(Set<String> languageCodes) throws IOException, InvalidUrlException;
+
+    /**
+     * Read the translated popover errors labels for the given language codes
+     *
+     * @param languageCodes
+     * @return
+     * @throws IOException
+     * @throws InvalidUrlException
+     */
+    Map<String, Map<String, String>> readErrorsLabel(Set<String> languageCodes) throws IOException, InvalidUrlException;
 }

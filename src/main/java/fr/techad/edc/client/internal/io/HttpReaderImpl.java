@@ -50,6 +50,7 @@ public class HttpReaderImpl implements EdcReader {
     private static final String POPOVER_I18N_PATH = "i18n/popover/";
     private static final String I18N_FILE_EXTENSION = ".json";
     private static final String I18N_LABELS_ROOT = "labels";
+    private static final String I18N_ERRORS_LABELS_ROOT = "errors";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpReaderImpl.class);
     private HttpClient client;
@@ -96,6 +97,17 @@ public class HttpReaderImpl implements EdcReader {
         if (languageCodes != null) {
             for (String languageCode : languageCodes) {
                 labels.put(languageCode, readLabelsForLang(languageCode));
+            }
+        }
+        return labels;
+    }
+
+    @Override
+    public Map<String, Map<String, String>> readErrorsLabel(Set<String> languageCodes) throws IOException, InvalidUrlException {
+        Map<String, Map<String, String>> labels = Maps.newHashMap();
+        if (languageCodes != null) {
+            for (String languageCode : languageCodes) {
+                labels.put(languageCode, readErrorsLabelsForLang(languageCode));
             }
         }
         return labels;
@@ -279,7 +291,7 @@ public class HttpReaderImpl implements EdcReader {
 
     }
 
-    private Map<String, String> readLabelsForLang(String languageCode) throws IOException, InvalidUrlException {
+    private Map<String, String> readLabelsList(String languageCode, String i18n_label) throws IOException, InvalidUrlException {
         Map<String, String> labels = Maps.newHashMap();
         String label;
 
@@ -293,9 +305,9 @@ public class HttpReaderImpl implements EdcReader {
             LOGGER.debug("Retrieved label: {}", label);
             // Decode Json
             JsonElement jsonContent = parseString(label);
-            if (jsonContent.isJsonObject() && jsonContent.getAsJsonObject().get(I18N_LABELS_ROOT) != null
-                    && jsonContent.getAsJsonObject().get(I18N_LABELS_ROOT).getAsJsonObject().isJsonObject()) {
-                JsonObject jsonObject = jsonContent.getAsJsonObject().get(I18N_LABELS_ROOT).getAsJsonObject();
+            if (jsonContent.isJsonObject() && jsonContent.getAsJsonObject().get(i18n_label) != null
+                    && jsonContent.getAsJsonObject().get(i18n_label).getAsJsonObject().isJsonObject()) {
+                JsonObject jsonObject = jsonContent.getAsJsonObject().get(i18n_label).getAsJsonObject();
                 labels = jsonObject.entrySet().stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, e -> {
                             LOGGER.debug("Creating map entry for key: {} and value {}", e.getKey(), e.getValue().getAsString());
@@ -308,6 +320,14 @@ public class HttpReaderImpl implements EdcReader {
 
         LOGGER.debug("Returning labels for lang {}, labels {}", languageCode, labels);
         return labels;
+    }
+
+    private Map<String, String> readLabelsForLang(String languageCode) throws IOException, InvalidUrlException {
+        return readLabelsList(languageCode, I18N_LABELS_ROOT);
+    }
+
+    private Map<String, String> readErrorsLabelsForLang(String languageCode) throws IOException, InvalidUrlException {
+        return readLabelsList(languageCode, I18N_ERRORS_LABELS_ROOT);
     }
 
 }
