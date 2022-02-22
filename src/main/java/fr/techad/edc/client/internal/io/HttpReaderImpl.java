@@ -7,14 +7,11 @@ package fr.techad.edc.client.internal.io;
 import com.google.common.base.Enums;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import fr.techad.edc.client.injector.provider.ContextItemProvider;
 import fr.techad.edc.client.injector.provider.DocumentationItemProvider;
 import fr.techad.edc.client.injector.provider.InformationProvider;
+import fr.techad.edc.client.internal.util.I18nContentImpl;
 import fr.techad.edc.client.internal.TranslationConstants;
 import fr.techad.edc.client.internal.http.Error4xxException;
 import fr.techad.edc.client.internal.http.HttpClient;
@@ -50,7 +47,6 @@ public class HttpReaderImpl implements EdcReader {
     private static final String POPOVER_I18N_PATH = "i18n/popover/";
     private static final String I18N_FILE_EXTENSION = ".json";
     private static final String I18N_LABELS_ROOT = "labels";
-    private static final String I18N_ERRORS_LABELS_ROOT = "errors";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpReaderImpl.class);
     private HttpClient client;
@@ -92,22 +88,11 @@ public class HttpReaderImpl implements EdcReader {
     }
 
     @Override
-    public Map<String, Map<String, String>> readLabels(Set<String> languageCodes) throws IOException, InvalidUrlException {
+    public Map<String, Map<String, String>> readLabels(Set<String> languageCodes, String key) throws IOException, InvalidUrlException {
         Map<String, Map<String, String>> labels = Maps.newHashMap();
         if (languageCodes != null) {
             for (String languageCode : languageCodes) {
-                labels.put(languageCode, readLabelsForLang(languageCode));
-            }
-        }
-        return labels;
-    }
-
-    @Override
-    public Map<String, Map<String, String>> readErrorsLabel(Set<String> languageCodes) throws IOException, InvalidUrlException {
-        Map<String, Map<String, String>> labels = Maps.newHashMap();
-        if (languageCodes != null) {
-            for (String languageCode : languageCodes) {
-                labels.put(languageCode, readErrorsLabelsForLang(languageCode));
+                labels.put(languageCode, readLabelsForLang(languageCode, key));
             }
         }
         return labels;
@@ -291,8 +276,8 @@ public class HttpReaderImpl implements EdcReader {
 
     }
 
-    private Map<String, String> readLabelsList(String languageCode, String i18n_label) throws IOException, InvalidUrlException {
-        Map<String, String> labels = Maps.newHashMap();
+    private Map<String, String> readi18nContent(String languageCode, String key) throws IOException, InvalidUrlException {
+        I18nContentImpl labels = new I18nContentImpl();
         String label;
 
         String relativePath = POPOVER_I18N_PATH + languageCode + I18N_FILE_EXTENSION;
@@ -305,29 +290,35 @@ public class HttpReaderImpl implements EdcReader {
             LOGGER.debug("Retrieved label: {}", label);
             // Decode Json
             JsonElement jsonContent = parseString(label);
-            if (jsonContent.isJsonObject() && jsonContent.getAsJsonObject().get(i18n_label) != null
-                    && jsonContent.getAsJsonObject().get(i18n_label).getAsJsonObject().isJsonObject()) {
-                JsonObject jsonObject = jsonContent.getAsJsonObject().get(i18n_label).getAsJsonObject();
-                labels = jsonObject.entrySet().stream()
+            if (jsonContent.isJsonObject() && jsonContent.getAsJsonObject().get(key) != null
+                    && jsonContent.getAsJsonObject().get(key).getAsJsonObject().isJsonObject()) {
+                JsonObject jsonObject = jsonContent.getAsJsonObject().get(key).getAsJsonObject();
+
+                Map<String, String> i18nContent = jsonObject.entrySet().stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, e -> {
                             LOGGER.debug("Creating map entry for key: {} and value {}", e.getKey(), e.getValue().getAsString());
                             return e.getValue().getAsString();
                         }));
+
+                if(key == I18N_LABELS_ROOT){
+                    labels.setI18nLabel(i18nContent);
+                }else{
+                    labels.setI18nError(i18nContent);
+                }
+
             }
         } catch (Error4xxException e) {
             LOGGER.error("Could not read the labels for the lang {}, err {}", languageCode, e);
         }
 
-        LOGGER.debug("Returning labels for lang {}, labels {}", languageCode, labels);
-        return labels;
+        LOGGER.debug("Returning labels for lang jSON {}, labels {}", languageCode, labels);
+        return key == I18N_LABELS_ROOT ? labels.getLabel() : labels.getError();
+
     }
 
-    private Map<String, String> readLabelsForLang(String languageCode) throws IOException, InvalidUrlException {
-        return readLabelsList(languageCode, I18N_LABELS_ROOT);
+    private Map<String, String> readLabelsForLang(String languageCode, String key) throws IOException, InvalidUrlException {
+        return readi18nContent(languageCode, key);
     }
 
-    private Map<String, String> readErrorsLabelsForLang(String languageCode) throws IOException, InvalidUrlException {
-        return readLabelsList(languageCode, I18N_ERRORS_LABELS_ROOT);
-    }
 
 }

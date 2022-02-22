@@ -44,7 +44,7 @@ public class TranslationManagerImpl implements TranslationManager {
                 this.addToDefaultLanguages(entry.getKey(), information);
                 this.addToLanguages(information);
             }
-            this.labels.putAll(this.reader.readLabels(this.languageCodes));
+            this.labels.putAll(this.reader.readLabels(this.languageCodes, null));
         }
     }
 
