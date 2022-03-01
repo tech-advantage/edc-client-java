@@ -6,6 +6,7 @@ package fr.techad.edc.client;
 
 import fr.techad.edc.client.injector.provider.ContextItemProvider;
 import fr.techad.edc.client.injector.provider.DocumentationItemProvider;
+import fr.techad.edc.client.injector.provider.I18NProvider;
 import fr.techad.edc.client.injector.provider.InformationProvider;
 import fr.techad.edc.client.internal.Constants;
 import fr.techad.edc.client.internal.DocumentationManagerImpl;
@@ -56,12 +57,11 @@ public abstract class CommonBase {
         ClientConfiguration clientConfiguration = createClientConfiguration();
         KeyUtil keyUtil = createKeyBuilder();
         ContextItemProvider contextItemProvider = new ContextItemProvider();
-
         DocumentationItemProvider documentationItemProvider = new DocumentationItemProvider();
         InformationProvider informationProvider = new InformationProvider();
-        this.edcReader = new HttpReaderImpl(httpClient, clientConfiguration, keyUtil, contextItemProvider, documentationItemProvider, informationProvider);
+        I18NProvider i18nProvider = new I18NProvider();
+        this.edcReader = new HttpReaderImpl(httpClient, clientConfiguration, keyUtil, contextItemProvider, documentationItemProvider, informationProvider, i18nProvider);
         return this.edcReader;
-
     }
 
     protected UrlUtil createUrlBuilder() {

@@ -4,8 +4,8 @@
 
 package fr.techad.edc.client.io;
 
-import com.google.common.collect.Table;
 import fr.techad.edc.client.model.ContextItem;
+import fr.techad.edc.client.model.I18NContent;
 import fr.techad.edc.client.model.Information;
 import fr.techad.edc.client.model.InvalidUrlException;
 
@@ -45,5 +45,15 @@ public interface EdcReader {
      * @throws IOException if an error occurred during the read
      * @throws InvalidUrlException if the url is malformed
      */
-    Map<String, Map<String, String>> readLabels(Set<String> languageCodes, String key) throws IOException, InvalidUrlException;
+    Map<String, Map<String, String>> readLabels(Set<String> languageCodes) throws IOException, InvalidUrlException;
+
+    /**
+     * Read the translated popover label for the given language code
+     *
+     * @param languageCode
+     * @return an object
+     * @throws IOException
+     * @throws InvalidUrlException
+     */
+    I18NContent readLabel(String languageCode) throws IOException, InvalidUrlException;
 }
