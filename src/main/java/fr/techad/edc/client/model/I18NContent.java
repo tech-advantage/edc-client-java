@@ -1,5 +1,8 @@
 package fr.techad.edc.client.model;
 
+import java.util.Map;
+import java.util.Set;
+
 public interface I18NContent {
 
     /**
@@ -30,4 +33,18 @@ public interface I18NContent {
      */
     String getError(String language, String key);
 
+    /**
+     * Set labels
+     *
+     * @param languageCode
+     * @param readLabelsForLang
+     */
+    void setLabels(String languageCode, Map<String, String> readLabelsForLang);
+
+    /**
+     * Read the translated popover labels for the given language codes
+     *
+     * @return labels
+     */
+    Map<String, Map<String, String>> getLabels();
 }

@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fr.techad.edc.client.TranslationManager;
 import fr.techad.edc.client.io.EdcReader;
+import fr.techad.edc.client.model.I18NContent;
 import fr.techad.edc.client.model.Information;
 import fr.techad.edc.client.model.InvalidUrlException;
 import fr.techad.edc.client.util.TranslationUtil;
@@ -44,7 +45,7 @@ public class TranslationManagerImpl implements TranslationManager {
                 this.addToDefaultLanguages(entry.getKey(), information);
                 this.addToLanguages(information);
             }
-            this.labels.putAll(this.reader.readLabels(this.languageCodes));
+            this.labels.putAll(this.reader.readLabel(this.languageCodes).getLabels());
         }
     }
 

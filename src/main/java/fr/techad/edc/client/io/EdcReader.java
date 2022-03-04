@@ -38,22 +38,12 @@ public interface EdcReader {
     Map<String, Information> readInfo() throws IOException, InvalidUrlException;
 
     /**
-     * Read the translated popover labels for the given language codes
-     *
-     * @param languageCodes the languages code to read
-     * @return a map containing the keys and label translations associated
-     * @throws IOException if an error occurred during the read
-     * @throws InvalidUrlException if the url is malformed
-     */
-    Map<String, Map<String, String>> readLabels(Set<String> languageCodes) throws IOException, InvalidUrlException;
-
-    /**
      * Read the translated popover label for the given language code
      *
-     * @param languageCode
+     * @param languageCodes
      * @return an object
      * @throws IOException
      * @throws InvalidUrlException
      */
-    I18NContent readLabel(String languageCode) throws IOException, InvalidUrlException;
+    I18NContent readLabel(Set<String> languageCodes) throws IOException, InvalidUrlException;
 }
