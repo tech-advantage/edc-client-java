@@ -14,10 +14,15 @@ public interface TranslationConstants {
 
     String ARTICLES_KEY = "articles";
     String LINKS_KEY = "links";
+    String ERRORS_KEY = "failedData";
 
     Map<String, String> DEFAULT_LABELS = Stream.of(
             new AbstractMap.SimpleEntry<>(ARTICLES_KEY, "Need more..."),
             new AbstractMap.SimpleEntry<>(LINKS_KEY, "Related topics"))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+    Map<String, String> DEFAULT_ERRORS = Stream.of(
+                    new AbstractMap.SimpleEntry<>(ERRORS_KEY, "An error occurred when fetching data ! \\nCheck the brick keys provided to the EdcHelp component."))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     
     Set<String> LANGUAGE_CODES = Sets.newHashSet(

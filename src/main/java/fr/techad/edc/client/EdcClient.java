@@ -90,6 +90,24 @@ public interface EdcClient {
     String getLabel(String labelKey, String languageCode, String publicationId) throws IOException, InvalidUrlException;
 
     /**
+     * Return the error translation for the given key
+     * Will read the translated errors from the the i18n files present in the documentation export
+     * (by default in folder doc/i18n/popover/*.json)
+     *
+     * If error was not found in the requested language, it will try and read in the publication default language
+     * (as defined in the info.json file),
+     * or in global default errors as a final fallback
+     *
+     * @param errorKey
+     * @param languageCode
+     * @param publicationId
+     * @return
+     * @throws IOException
+     * @throws InvalidUrlException
+     */
+    String getError(String errorKey, String languageCode, String publicationId) throws IOException, InvalidUrlException;
+
+    /**
      * Define the server url like http://localhost:8080
      *
      * @param serverUrl the server url

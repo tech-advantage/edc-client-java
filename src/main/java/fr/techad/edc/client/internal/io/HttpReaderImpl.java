@@ -41,7 +41,6 @@ public class HttpReaderImpl implements EdcReader {
 
     private static final String POPOVER_I18N_PATH = "i18n/popover/";
     private static final String I18N_FILE_EXTENSION = ".json";
-    private static final String I18N_LABELS_ROOT = "labels";
 
     Map<String, String> labels = Maps.newHashMap();
 
@@ -89,12 +88,11 @@ public class HttpReaderImpl implements EdcReader {
 
     @Override
     public I18NContent readLabel(Set<String> languageCodes) throws IOException, InvalidUrlException {
-        I18NContent i18NContent = null;
+        I18NContent i18NContent = this.i18NProvider.get();
 
         if (languageCodes != null) {
             for (String languageCode : languageCodes) {
-                i18NContent = readi18NContent(languageCode);
-                i18NContent.setLabels(languageCode, this.labels);
+                i18NContent = readi18NContent(languageCode, i18NContent);
             }
 
         }
@@ -286,10 +284,8 @@ public class HttpReaderImpl implements EdcReader {
         return labelUrl;
     }
 
-    private I18NContent readi18NContent(String languageCode) throws IOException, InvalidUrlException {
-        I18NContent i18NContent = i18NProvider.get();
+    private I18NContent readi18NContent(String languageCode, I18NContent i18nContent) throws IOException, InvalidUrlException {
         String label;
-
         String labelUrl = getLabelUrl(languageCode);
 
         try {
@@ -306,16 +302,15 @@ public class HttpReaderImpl implements EdcReader {
                labels = jsonObjectType.entrySet().stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, e -> {
                             LOGGER.debug("Creating map entry for key: {} and value {}", e.getKey(), e.getValue().getAsString());
-                            i18NContent.setMessage(languageCode, key, e.getKey(), e.getValue().getAsString());
+                            i18nContent.setMessage(languageCode, key, e.getKey(), e.getValue().getAsString());
 
                             return e.getValue().getAsString();
                         }));
-                i18NContent.setLabels(languageCode, labels);
             }
         } catch (Error4xxException e) {
             LOGGER.error("Could not read the label for the lang {}, err {}", languageCode, e);
         }
 
-        return i18NContent;
+        return i18nContent;
     }
 }

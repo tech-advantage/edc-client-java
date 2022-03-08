@@ -77,6 +77,11 @@ public class EdcClientSingleton implements EdcClient {
     }
 
     @Override
+    public String getError(String errorKey, String languageCode, String publicationId) throws IOException, InvalidUrlException {
+        return edcClient.getError(errorKey, languageCode, publicationId);
+    }
+
+    @Override
     public void setServerUrl(String serverUrl) {
         edcClient.setServerUrl(serverUrl);
     }
