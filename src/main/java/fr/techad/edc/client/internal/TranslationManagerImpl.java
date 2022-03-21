@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
 import fr.techad.edc.client.TranslationManager;
 import fr.techad.edc.client.io.EdcReader;
 import fr.techad.edc.client.model.I18NContent;
-import fr.techad.edc.client.model.I18nTranslation;
 import fr.techad.edc.client.model.Information;
 import fr.techad.edc.client.model.InvalidUrlException;
 import fr.techad.edc.client.util.TranslationUtil;
@@ -18,6 +17,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+
+import static fr.techad.edc.client.model.I18nTranslation.I18N_ERRORS_ROOT;
+import static fr.techad.edc.client.model.I18nTranslation.I18N_LABELS_ROOT;
 
 public class TranslationManagerImpl implements TranslationManager {
 
@@ -60,13 +62,15 @@ public class TranslationManagerImpl implements TranslationManager {
     @Override
     public String getLabel(String labelKey, String languageCode, String publicationId) {
         LOGGER.debug("Getting label with key {}, for languageCode {} and publicationId {}", labelKey, languageCode, publicationId);
-        return StringUtils.isNotBlank(getTranslation(languageCode, I18nTranslation.I18N_LABELS_ROOT.getValue(), labelKey, publicationId)) ? getTranslation(languageCode, I18nTranslation.I18N_LABELS_ROOT.getValue(), labelKey, publicationId) : TranslationConstants.DEFAULT_LABELS.get(labelKey);
+        String translationLabelValue = getTranslation(languageCode, I18N_LABELS_ROOT.getValue(), labelKey, publicationId);
+        return StringUtils.isNotBlank(translationLabelValue) ? translationLabelValue : TranslationConstants.DEFAULT_LABELS.get(labelKey);
     }
 
     @Override
     public String getError(String labelKey, String languageCode, String publicationId) {
         LOGGER.debug("Getting error with key {}, for languageCode {} and publicationId {}", labelKey, languageCode, publicationId);
-        return StringUtils.isNotBlank(getTranslation(languageCode, I18nTranslation.I18N_ERRORS_ROOT.getValue(), labelKey, publicationId)) ? getTranslation(languageCode, I18nTranslation.I18N_ERRORS_ROOT.getValue(), labelKey, publicationId) : TranslationConstants.DEFAULT_ERRORS.get(labelKey);
+        String translationErrorValue = getTranslation(languageCode, I18N_ERRORS_ROOT.getValue(), labelKey, publicationId);
+        return StringUtils.isNotBlank(translationErrorValue) ? translationErrorValue : TranslationConstants.DEFAULT_ERRORS.get(labelKey);
     }
 
     @Override

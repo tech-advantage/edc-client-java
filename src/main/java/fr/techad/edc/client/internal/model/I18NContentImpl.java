@@ -13,17 +13,17 @@ public class I18NContentImpl implements I18NContent {
 
     private Logger LOGGER = LoggerFactory.getLogger(HttpReaderImpl.class);
 
-    Map<String, String> traduction = new HashMap<String, String>();
+    Map<String, String> translation = new HashMap<String, String>();
 
     @Override
     public String getTranslation(String lang, String type, String key, String publicationId){
         LOGGER.debug("Get translation lang: {}, type: {}, key: {}, publicationId: {} ", lang, type, key, publicationId);
-        return traduction.get(lang+"."+type+"."+key);
+        return translation.get(lang+"."+type+"."+key);
     }
 
     @Override
     public void setMessage(String lang, String type, String key, String value){
         LOGGER.debug("Set Message traduction lang: {}, type: {}, key: {}, value: {} ", lang, type, key, value);
-        traduction.put(lang+"."+type+"."+key, value);
+        translation.put(lang+"."+type+"."+key, value);
     }
 }

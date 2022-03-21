@@ -12,7 +12,6 @@ import fr.techad.edc.client.injector.provider.ContextItemProvider;
 import fr.techad.edc.client.injector.provider.DocumentationItemProvider;
 import fr.techad.edc.client.injector.provider.I18NProvider;
 import fr.techad.edc.client.injector.provider.InformationProvider;
-import fr.techad.edc.client.internal.TranslationConstants;
 import fr.techad.edc.client.internal.http.Error4xxException;
 import fr.techad.edc.client.internal.http.HttpClient;
 import fr.techad.edc.client.io.EdcReader;
@@ -28,6 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static fr.techad.edc.client.model.I18nTranslation.DEFAULT_LANGUAGE_CODE;
+
 /**
  * Implement EdcReader to communicate with a server
  */
@@ -41,8 +42,6 @@ public class HttpReaderImpl implements EdcReader {
 
     private static final String POPOVER_I18N_PATH = "i18n/popover/";
     private static final String I18N_FILE_EXTENSION = ".json";
-
-    Map<String, String> labels = Maps.newHashMap();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpReaderImpl.class);
     private HttpClient client;
@@ -92,7 +91,7 @@ public class HttpReaderImpl implements EdcReader {
 
         if (languageCodes != null) {
             for (String languageCode : languageCodes) {
-                i18NContent = readi18NContent(languageCode, i18NContent);
+                readi18NContent(languageCode, i18NContent);
             }
 
         }
@@ -157,7 +156,7 @@ public class HttpReaderImpl implements EdcReader {
 
             if (jsonContent.isJsonObject()) {
                 JsonObject infoSrc = jsonContent.getAsJsonObject();
-                String defaultLangCode = infoSrc.get("defaultLanguage") != null ? infoSrc.get("defaultLanguage").getAsString() : TranslationConstants.DEFAULT_LANGUAGE_CODE;
+                String defaultLangCode = infoSrc.get("defaultLanguage") != null ? infoSrc.get("defaultLanguage").getAsString() : DEFAULT_LANGUAGE_CODE.getValue();
                 information.setDefaultLanguage(defaultLangCode);
                 LOGGER.debug("Setting default Language from info.json : {}", defaultLangCode);
 
@@ -177,9 +176,9 @@ public class HttpReaderImpl implements EdcReader {
             LOGGER.error("Could not initialize info from info.json for publication id : {}", publicationId, e);
         } finally {
             if (StringUtils.isBlank(information.getDefaultLanguage()))
-                information.setDefaultLanguage(TranslationConstants.DEFAULT_LANGUAGE_CODE);
+                information.setDefaultLanguage(DEFAULT_LANGUAGE_CODE.getValue());
             if (information.getLanguages() == null || information.getLanguages().isEmpty())
-                information.setLanguages(Sets.newHashSet(TranslationConstants.DEFAULT_LANGUAGE_CODE));
+                information.setLanguages(Sets.newHashSet(DEFAULT_LANGUAGE_CODE.getValue()));
             LOGGER.debug("Created information from info.json : {}", information);
         }
 
@@ -284,7 +283,7 @@ public class HttpReaderImpl implements EdcReader {
         return labelUrl;
     }
 
-    private I18NContent readi18NContent(String languageCode, I18NContent i18nContent) throws IOException, InvalidUrlException {
+    private void readi18NContent(String languageCode, I18NContent i18nContent) throws IOException, InvalidUrlException {
         String label;
         String labelUrl = getLabelUrl(languageCode);
 
@@ -299,7 +298,7 @@ public class HttpReaderImpl implements EdcReader {
 
             for (String key : i18NKeys) {
                 jsonObjectType = jsonContent.getAsJsonObject().get(key).getAsJsonObject();
-               labels = jsonObjectType.entrySet().stream()
+                jsonObjectType.entrySet().stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, e -> {
                             LOGGER.debug("Creating map entry for key: {} and value {}", e.getKey(), e.getValue().getAsString());
                             i18nContent.setMessage(languageCode, key, e.getKey(), e.getValue().getAsString());
@@ -310,7 +309,5 @@ public class HttpReaderImpl implements EdcReader {
         } catch (Error4xxException e) {
             LOGGER.error("Could not read the label for the lang {}, err {}", languageCode, e);
         }
-
-        return i18nContent;
     }
 }

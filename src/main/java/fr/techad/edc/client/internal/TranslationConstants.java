@@ -8,25 +8,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static fr.techad.edc.client.model.I18nTranslation.*;
+
 public interface TranslationConstants {
 
-    String DEFAULT_LANGUAGE_CODE = "en";
-
-    String ARTICLES_KEY = "articles";
-    String LINKS_KEY = "links";
-    String COMING_SOON_KEY = "comingSoon";
-    String ERROR_TITLE_KEY = "errorTitle";
-    String ERRORS_KEY = "failedData";
-
     Map<String, String> DEFAULT_LABELS = Stream.of(
-            new AbstractMap.SimpleEntry<>(ARTICLES_KEY, "Need more..."),
-            new AbstractMap.SimpleEntry<>(LINKS_KEY, "Related topics"),
-            new AbstractMap.SimpleEntry<>(COMING_SOON_KEY, "Contextual help is coming soon."),
-            new AbstractMap.SimpleEntry<>(ERROR_TITLE_KEY, "Error"))
+            new AbstractMap.SimpleEntry<>(ARTICLES_KEY.getValue(), "Need more..."),
+            new AbstractMap.SimpleEntry<>(LINKS_KEY.getValue(), "Related topics"),
+            new AbstractMap.SimpleEntry<>(COMING_SOON_KEY.getValue(), "Contextual help is coming soon."),
+            new AbstractMap.SimpleEntry<>(ERROR_TITLE_KEY.getValue(), "Error"))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     Map<String, String> DEFAULT_ERRORS = Stream.of(
-                    new AbstractMap.SimpleEntry<>(ERRORS_KEY, "An error occurred when fetching data ! \\nCheck the brick keys provided to the EdcHelp component."))
+                    new AbstractMap.SimpleEntry<>(ERRORS_KEY.getValue(), "An error occurred when fetching data ! \\nCheck the brick keys provided to the EdcHelp component."))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     
     Set<String> LANGUAGE_CODES = Sets.newHashSet(

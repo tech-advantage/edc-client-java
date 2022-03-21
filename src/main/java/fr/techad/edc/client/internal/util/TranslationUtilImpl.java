@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static fr.techad.edc.client.model.I18nTranslation.DEFAULT_LANGUAGE_CODE;
+
 public class TranslationUtilImpl implements TranslationUtil {
 
     @Override
@@ -31,7 +33,7 @@ public class TranslationUtilImpl implements TranslationUtil {
 
     private String getDefaultLanguage(Information info) {
         return (info != null && StringUtils.isNotBlank(info.getDefaultLanguage())) ?
-                info.getDefaultLanguage() : TranslationConstants.DEFAULT_LANGUAGE_CODE;
+                info.getDefaultLanguage() : DEFAULT_LANGUAGE_CODE.getValue();
     }
 
 }
