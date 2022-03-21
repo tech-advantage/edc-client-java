@@ -14,11 +14,15 @@ public interface TranslationConstants {
 
     String ARTICLES_KEY = "articles";
     String LINKS_KEY = "links";
+    String COMING_SOON_KEY = "comingSoon";
+    String ERROR_TITLE_KEY = "errorTitle";
     String ERRORS_KEY = "failedData";
 
     Map<String, String> DEFAULT_LABELS = Stream.of(
             new AbstractMap.SimpleEntry<>(ARTICLES_KEY, "Need more..."),
-            new AbstractMap.SimpleEntry<>(LINKS_KEY, "Related topics"))
+            new AbstractMap.SimpleEntry<>(LINKS_KEY, "Related topics"),
+            new AbstractMap.SimpleEntry<>(COMING_SOON_KEY, "Contextual help is coming soon."),
+            new AbstractMap.SimpleEntry<>(ERROR_TITLE_KEY, "Error"))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     Map<String, String> DEFAULT_ERRORS = Stream.of(
