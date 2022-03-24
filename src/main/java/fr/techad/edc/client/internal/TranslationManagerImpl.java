@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fr.techad.edc.client.TranslationManager;
 import fr.techad.edc.client.io.EdcReader;
+import fr.techad.edc.client.model.I18NContent;
 import fr.techad.edc.client.model.Information;
 import fr.techad.edc.client.model.InvalidUrlException;
 import fr.techad.edc.client.util.TranslationUtil;
@@ -17,6 +18,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import static fr.techad.edc.client.model.I18nTranslation.I18N_ERRORS_ROOT;
+import static fr.techad.edc.client.model.I18nTranslation.I18N_LABELS_ROOT;
+
 public class TranslationManagerImpl implements TranslationManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TranslationManagerImpl.class);
@@ -24,7 +28,7 @@ public class TranslationManagerImpl implements TranslationManager {
     private EdcReader reader;
     private TranslationUtil translationUtil;
 
-    private Map<String, Map<String, String>> labels = Maps.newHashMap();
+    private I18NContent translation = null;
     // The languages codes present among all the publications
     private Set<String> languageCodes = Sets.newHashSet();
     // The default language code for each publication id
@@ -38,19 +42,19 @@ public class TranslationManagerImpl implements TranslationManager {
 
     @Override
     public void loadTranslations(Map<String, Information> publicationInformation) throws IOException, InvalidUrlException {
-        if (this.labels.isEmpty() && publicationInformation != null) {
+        if (this.translation == null && publicationInformation != null) {
             for (Map.Entry<String, Information> entry : publicationInformation.entrySet()) {
                 Information information = entry.getValue();
                 this.addToDefaultLanguages(entry.getKey(), information);
                 this.addToLanguages(information);
             }
-            this.labels.putAll(this.reader.readLabels(this.languageCodes));
+            this.translation = this.reader.readLabel(this.languageCodes);
         }
     }
 
     @Override
     public void forceReload() {
-        this.labels.clear();
+        this.translation = null;
         this.languageCodes.clear();
         this.defaultPublicationLanguages.clear();
     }
@@ -58,19 +62,25 @@ public class TranslationManagerImpl implements TranslationManager {
     @Override
     public String getLabel(String labelKey, String languageCode, String publicationId) {
         LOGGER.debug("Getting label with key {}, for languageCode {} and publicationId {}", labelKey, languageCode, publicationId);
-        Map<String, String> labelForLanguage = this.labels.get(languageCode);
-        if (labelForLanguage == null) {
-            String defaultLanguage = this.defaultPublicationLanguages.get(publicationId);
-            // If default language is not found, use default labels
-            labelForLanguage = this.labels.get(defaultLanguage) != null ? this.labels.get(defaultLanguage) : TranslationConstants.DEFAULT_LABELS;
-        }
-        // If no label values for the label key, return the default label for this key
-        return StringUtils.isNotBlank(labelForLanguage.get(labelKey)) ? labelForLanguage.get(labelKey) : TranslationConstants.DEFAULT_LABELS.get(labelKey);
+        String translationLabelValue = getTranslation(languageCode, I18N_LABELS_ROOT.getValue(), labelKey, publicationId);
+        return StringUtils.isNotBlank(translationLabelValue) ? translationLabelValue : TranslationConstants.DEFAULT_LABELS.get(labelKey);
+    }
+
+    @Override
+    public String getError(String labelKey, String languageCode, String publicationId) {
+        LOGGER.debug("Getting error with key {}, for languageCode {} and publicationId {}", labelKey, languageCode, publicationId);
+        String translationErrorValue = getTranslation(languageCode, I18N_ERRORS_ROOT.getValue(), labelKey, publicationId);
+        return StringUtils.isNotBlank(translationErrorValue) ? translationErrorValue : TranslationConstants.DEFAULT_ERRORS.get(labelKey);
     }
 
     @Override
     public Map<String, String> getDefaultPublicationLanguages() {
         return Collections.unmodifiableMap(this.defaultPublicationLanguages);
+    }
+
+    private String getTranslation(String lang, String type, String key, String publicationId){
+        LOGGER.debug("Getting translation with lang {}, type {}, for key {} and publicationId {}", lang, type, key, publicationId);
+        return this.translation.getTranslation(lang, type, key, publicationId);
     }
 
     private void addToDefaultLanguages(String publicationId, Information information) {

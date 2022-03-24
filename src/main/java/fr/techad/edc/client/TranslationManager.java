@@ -41,6 +41,18 @@ public interface TranslationManager {
     String getLabel(String labelKey, String languageCode, String publicationId);
 
     /**
+     * Return the translated popover error for the requested key
+     * If no error was found for the language, will look for the error in the publication default language
+     * Finally, system default errors will be used if no valid error was found in default language
+     *
+     * @param errorKey
+     * @param languageCode
+     * @param publicationId
+     * @return A string containing the translated error
+     */
+    String getError(String errorKey, String languageCode, String publicationId);
+
+    /**
      * Return a Map with the default language for each publication
      *
      * @return a Map containing the publication id as key, default language code as value

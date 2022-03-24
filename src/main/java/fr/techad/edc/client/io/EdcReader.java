@@ -5,6 +5,7 @@
 package fr.techad.edc.client.io;
 
 import fr.techad.edc.client.model.ContextItem;
+import fr.techad.edc.client.model.I18NContent;
 import fr.techad.edc.client.model.Information;
 import fr.techad.edc.client.model.InvalidUrlException;
 
@@ -37,12 +38,12 @@ public interface EdcReader {
     Map<String, Information> readInfo() throws IOException, InvalidUrlException;
 
     /**
-     * Read the translated popover labels for the given language codes
+     * Read the translated popover label for the given language code
      *
-     * @param languageCodes the languages code to read
-     * @return a map containing the keys and label translations associated
-     * @throws IOException if an error occurred during the read
-     * @throws InvalidUrlException if the url is malformed
+     * @param languageCodes
+     * @return an object
+     * @throws IOException
+     * @throws InvalidUrlException
      */
-    Map<String, Map<String, String>> readLabels(Set<String> languageCodes) throws IOException, InvalidUrlException;
+    I18NContent readLabel(Set<String> languageCodes) throws IOException, InvalidUrlException;
 }

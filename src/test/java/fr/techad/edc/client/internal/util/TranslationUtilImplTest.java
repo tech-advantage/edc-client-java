@@ -3,7 +3,6 @@ package fr.techad.edc.client.internal.util;
 import com.google.common.collect.Maps;
 import fr.techad.edc.client.CommonBase;
 import fr.techad.edc.client.injector.provider.InformationProvider;
-import fr.techad.edc.client.internal.TranslationConstants;
 import fr.techad.edc.client.model.Information;
 import fr.techad.edc.client.util.TranslationUtil;
 import org.junit.Assert;
@@ -13,6 +12,9 @@ import java.util.AbstractMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static fr.techad.edc.client.model.I18nTranslation.ARTICLES_KEY;
+import static fr.techad.edc.client.model.I18nTranslation.LINKS_KEY;
 
 public class TranslationUtilImplTest extends CommonBase {
 
@@ -79,9 +81,9 @@ public class TranslationUtilImplTest extends CommonBase {
     private Map<String, String> createLabels(String articlesLabel, String linksLabels) {
         Map<String, String> labels = Maps.newHashMap();
         if (articlesLabel != null)
-            labels.put(TranslationConstants.ARTICLES_KEY, articlesLabel);
+            labels.put(ARTICLES_KEY.getValue(), articlesLabel);
         if (linksLabels != null)
-            labels.put(TranslationConstants.LINKS_KEY, linksLabels);
+            labels.put(LINKS_KEY.getValue(), linksLabels);
         return labels;
     }
 }

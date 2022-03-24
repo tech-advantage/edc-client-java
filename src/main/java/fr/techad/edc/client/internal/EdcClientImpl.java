@@ -88,6 +88,14 @@ public class EdcClientImpl implements EdcClient {
     }
 
     @Override
+    public String getError(String errorKey, String languageCode, String publicationId) throws IOException, InvalidUrlException {
+        LOGGER.debug("Getting error for key {}, language code {} and publication id {}", errorKey, languageCode, publicationId);
+        // Make sure the whole context was previously loaded
+        loadContext();
+        return translationManager.getError(errorKey, languageCode, publicationId);
+    }
+
+    @Override
     public void setServerUrl(String serverUrl) {
         LOGGER.debug("New server url: {}", serverUrl);
         clientConfiguration.setServerUrl(serverUrl);

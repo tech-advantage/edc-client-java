@@ -12,6 +12,8 @@ import fr.techad.edc.client.InformationManager;
 import fr.techad.edc.client.TranslationManager;
 import fr.techad.edc.client.injector.provider.ContextItemProvider;
 import fr.techad.edc.client.injector.provider.DocumentationItemProvider;
+import fr.techad.edc.client.injector.provider.I18NProvider;
+import fr.techad.edc.client.injector.provider.InformationProvider;
 import fr.techad.edc.client.internal.DocumentationManagerImpl;
 import fr.techad.edc.client.internal.EdcClientImpl;
 import fr.techad.edc.client.internal.InformationManagerImpl;
@@ -22,9 +24,7 @@ import fr.techad.edc.client.internal.util.KeyUtilImpl;
 import fr.techad.edc.client.internal.util.TranslationUtilImpl;
 import fr.techad.edc.client.internal.util.UrlUtilImpl;
 import fr.techad.edc.client.io.EdcReader;
-import fr.techad.edc.client.model.ClientConfiguration;
-import fr.techad.edc.client.model.ContextItem;
-import fr.techad.edc.client.model.DocumentationItem;
+import fr.techad.edc.client.model.*;
 import fr.techad.edc.client.util.KeyUtil;
 import fr.techad.edc.client.util.TranslationUtil;
 import fr.techad.edc.client.util.UrlUtil;
@@ -52,6 +52,7 @@ public class EdcClientModule extends AbstractModule {
         bind(ClientConfiguration.class).to(ClientConfigurationImpl.class).in(Scopes.SINGLETON);
         bind(ContextItem.class).toProvider(ContextItemProvider.class);
         bind(DocumentationItem.class).toProvider(DocumentationItemProvider.class);
-
+        bind(I18NContent.class).toProvider(I18NProvider.class);
+        bind(Information.class).toProvider(InformationProvider.class);
     }
 }
