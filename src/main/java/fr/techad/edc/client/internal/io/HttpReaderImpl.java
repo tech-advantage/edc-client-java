@@ -221,6 +221,7 @@ public class HttpReaderImpl implements EdcReader {
         contextItem.setPublicationId(publicationId);
         contextItem.setDescription(description);
         contextItem.setMainKey(mainKey);
+        contextItem.setSubKey(subKey);
 
         createArticles(contextItem, jsonCtxt.get("articles").getAsJsonArray(), languageCode);
         createLinks(contextItem, jsonCtxt.get("links").getAsJsonArray(), languageCode);
